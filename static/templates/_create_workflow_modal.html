@@ -1,0 +1,250 @@
+{% load static %}
+
+<div class="modal fade" id="createWorkflowModal" tabindex="-1" role="dialog" aria-labelledby="createWorkflowModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create Workflow</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-12 smaller-font">
+          <select class="form-control" name="start-point" id="select-start-point" onchange="checkWorkflowBoundaries()">
+            <option value="">Select data type you want to process</option>
+            <option value="">fastq-gz</option>
+            <option value="">counts-fa</option>
+            <option value="">sam</option>
+            <option value="">pivot-table</option>
+          </select>
+          <select class="form-control" name="end-point" id="select-end-point" onchange="checkWorkflowBoundaries()">
+            <option value="">Which data type do you want to create as output?</option>
+            <option value="">counts-fa</option>
+            <option value="">sam</option>
+            <option value="">pivot-table</option>
+          </select>
+        </div>
+        <hr>
+
+        <div class="col-12 justify-content-center " id="workflowArea">
+          <div class="card-deck justify-content-center level-1">
+          </div>
+          <div class="card-deck justify-content-center level-2">
+          </div>
+          <div class="card-deck justify-content-center level-3">
+          </div>
+          <div class="card-deck justify-content-center level-4">
+          </div>
+          <div class="card-deck justify-content-center level-5">
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="selectProcessModal" tabindex="-1" role="dialog" aria-labelledby="selectWorkflowModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Select Process</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-12 smaller-font">
+          <select class="form-control" name="start-point" id="selectProcess-select" onchange="selectProcessUpdateInfo()">
+            <option value="">Select process</option>
+
+          </select>
+        </div>
+        <hr>
+        <div class="card-deck justify-content-center" id="selectProcessSelectedCard">
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick='$("#createWorkflowModal").modal()'>Close</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick='selectProcessSelected()'>Select</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script type="text/javascript">
+  var selectedProces = null
+  var latestType = null
+  var latestCard = null
+  var latest_created_card = null
+  let fullParts = {'header':1, 'body':1, 'footer':1}
+  var workflow_cards = {}
+  var workflows = {{workflows | safe}}
+  var data_type_explanations = {
+          'fastq-gz':'Raw FASTQ input, in .gz format (fastq.gz)',
+          'counts-fa':'FASTA file composed of reads and counts. Default data storage type'
+                                }
+
+  function checkWorkflowBoundaries() {
+    start_index = document.getElementById('select-start-point').selectedIndex
+    end_index = document.getElementById('select-end-point').selectedIndex
+    d3.selectAll('.level-1').select('div.card').remove()
+    if ( start_index > 0 ){//& end_index > 0) {
+
+      var start_type = document.getElementById('select-start-point').options[start_index].text
+      var start_card = createEmptyWorkflowCard('level-1', start_type, {'body':1, 'footer':1})
+      console.log(start_card)
+      latestCard = start_card
+
+      start_card.select('.card-block').html(data_type_explanations[start_type])
+      start_card.select('.card-footer').select('.data-type').html("<button type='button'class='btn btn-sm btn-info' id='data-type-output-"+start_type+"' onclick='addProcess(\"" + start_type + "\")'> + "+start_type+"</button>")
+
+      //var end_type = document.getElementById('select-end-point').options[end_index].text
+      //var end_card = createEmptyWorkflowCard('end', 'level-5', end_type, {'header':1, 'body':1})
+      //end_card.select('.card-header').select('.data-type').html(end_type)
+      //end_card.select('.card-block').html(data_type_explanations[end_type])
+    }
+  }
+
+
+  function createEmptyWorkflowCard(target_level, target_id, parts) {
+    console.log(target_level, target_id, parts)
+    var card = d3.select('.' + target_level).append('div').attr('class', 'card w-50').attr('id', target_id).attr('level', target_level.split('-')[1])
+    if (parts['header']) {
+      var header = card.append('div').attr('class', 'card-header')
+      header.append('div').attr('class', 'data-type')
+      header.append('div').attr('class', 'gets-from')
+    }
+    if (parts['body']) {
+      var body = card.append('div').attr('class', 'card-block smaller-font')
+      card.append('div').attr('class', 'delete')
+    }
+    if (parts['footer']) {
+      var footer = card.append('div').attr('class', 'card-footer')
+      footer.append('div').attr('class', 'data-type')
+      footer.append('div').attr('class', 'gets-from')
+    }
+
+    return card
+
+  }
+
+  function addProcess(type){
+    latestType = type
+    passed = workflows.filter(function(d){ return d['fields']['inputs'].includes(':'+type+':')})
+    $("#createWorkflowModal").modal('hide')
+    $("#selectProcessModal").modal()
+    var selectProcess = d3.select('#selectProcess-select')
+    selectProcess.selectAll('option').remove()
+    selectProcess.append('option').text('Select Process')
+    for(var i=0; i<passed.length; i++){
+      selectProcess.append('option').text(passed[i]['fields']['process_id'])
+      console.log(passed[i]['fields']['process_id'])
+    }
+    selectProcessUpdateInfo()
+
+  }
+
+  function fillWorkflowCard(card, selectedProces) {
+
+    var info = workflows.filter(function(d){ return d['fields']['process_id'] == selectedProces})[0]
+    var inputs = info['fields']['inputs'].split(";")
+    var input_text = inputs.map(function(d){
+              fields = d.split(':');
+              return "<button type='button' class='btn btn-sm btn-info' disabled id='data-type-input-"+fields[1]+"'>" + fields[1]+" (" + fields[0] + ")"
+            }).join(' ')
+    var outputs = info['fields']['outputs'].split(";")
+    var output_text = "<div class='row'><div class='col'>" + outputs.map(function(d){
+              fields = d.split(':');
+              return "<button type='button' class='btn btn-sm btn-success' id='data-type-output-"+fields[1]+"'  onclick='addProcess(\"" + fields[1] + "\")'  >" + fields[1]+" (" + fields[0] + ")"
+            }).join(" </div><div class='col'> ") + '</div></div>'
+
+
+    card.select('div.card-header').select('.data-type').style('color', 'white').html(input_text)
+    card.select('div.card-block').html(info['fields']['description'])
+    card.select('div.card-footer').select('.data-type').style('color', 'white').html(output_text)
+
+    //createEmptyWorkflowCard(target_level, target_id, parts)
+
+  }
+
+
+  function disableButton(card, io, type) {
+    console.log(card, io, type)
+    let card_io = {'input':'header', 'output':'footer'}
+    card.select('div.card-'+card_io[io]).select('.data-type').select('button#data-type-'+io+'-'+type).attr('disabled', 'true')
+  }
+
+  function selectProcessSelected(){
+    var index = document.getElementById('selectProcess-select').selectedIndex
+    if (index>0) {
+      selectedProces = document.getElementById('selectProcess-select').options[index].text
+      console.log(selectedProces)
+      $("#createWorkflowModal").modal()
+
+      disableButton(latestCard, 'output', latestType)
+      var new_target_level = 'level-' + (parseInt(latestCard.attr('level'))+1)
+      var card = createEmptyWorkflowCard(new_target_level, selectedProces, fullParts)
+      latestCard = card
+      fillWorkflowCard(card, selectedProces)
+
+
+    }else {
+      selectedProces = null
+    }
+
+  }
+
+
+  function selectProcessUpdateInfo(){
+    var index = document.getElementById('selectProcess-select').selectedIndex
+
+    if (index > 0) {
+        d3.select('#selectProcessSelectedCard').selectAll('.card').remove()
+        selectedProces = document.getElementById('selectProcess-select').options[index].text
+        var info = workflows.filter(function(d){ return d['fields']['process_id'] == selectedProces})[0]
+        var inputs = info['fields']['inputs'].split(";")
+        var input_text = inputs.map(function(d){
+                  fields = d.split(':');
+                  return fields[1]+"(" + fields[0] + ")"
+                }).join(" / ")
+        var outputs = info['fields']['outputs'].split(";")
+        var output_text = outputs.map(function(d){
+                  fields = d.split(':');
+                  return fields[1]+"(" + fields[0] + ")"
+                }).join(" / ")
+
+        var card = d3.select('#selectProcessSelectedCard').append('div').attr('class', 'card w-50')
+        card.append('div').attr('class', 'card-header').style('background', 'blue').style('color', 'white').html(input_text)
+        card.append('div').attr('class', 'card-block').html(info['fields']['description'])
+        card.append('div').attr('class', 'card-footer').style('background', 'green').style('color', 'white').html(output_text)
+    }else {
+      d3.select('#selectProcessSelectedCard').selectAll('.card').remove()
+      selectedProces = null
+    }
+
+  }
+
+
+</script>
+
+<style>
+  .modal-dialog{
+    overflow-y: initial !important
+  }
+  .modal-body{
+    height: 500px;
+    overflow-y: auto;
+  }
+</style>

@@ -1,0 +1,26 @@
+{% extends 'templates/master.html' %}
+{% load static %}
+
+
+
+	<title>{% block title %}Explore Data to Gain Insight{% endblock %}</title>
+
+	{% block body %}
+  <div class="row">
+
+
+		{{intro_message}}
+		{% if no_of_samples < 1 %}
+			<button type="button" class="btn btn-lg btn-warning btn-block">Upload Data First</button>
+		{%endif%}
+
+
+	{% endblock %}
+
+
+
+
+	{% block afterbody %}
+
+
+	{% endblock %}
