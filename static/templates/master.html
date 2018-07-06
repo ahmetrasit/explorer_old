@@ -20,7 +20,7 @@
     <div class="fluid-container">
 
       <nav class="navbar navbar-expand-sm navbar-dark bg-secondary justify-content-center p-0 m-0">
-        <a class="navbar-brand text-center" href="/">Explore Data  <small>{{ team_name }}</small></a>
+        <a class="navbar-brand text-center" href="/">Explore Data <small>{{ team_name }}</small></a>
       </nav>
       <nav class="navbar navbar-expand-sm navbar-light bg-light p-0 mb-4">
         <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
@@ -73,21 +73,21 @@
         </div>
       </nav>
     </div>
+    <div class="text-center">
+      <small style="font-size:1.1em">{{ intro_message }}</small>
+    </nav>
 
     <div class="container text-center">
-      {% if intro_message|length < 1 %}
-        <button type="button" class="btn btn-lg btn-danger btn-block">Start Configuration<br><small>Better sooner than later</button>
+      {% if user.is_authenticated %}
 
+        {% block body %}{% endblock %}
       {% else %}
-        {% if user.is_authenticated %}
-          {% block body %}{% endblock %}
-        {% else %}
-          <br>
-            <div class="jumbotron">
-              You need to login to explore your data.
-            </div>
-        {% endif %}
-      {%endif%}
+        <br>
+          <div class="jumbotron">
+            You need to login to explore your data.
+          </div>
+      {% endif %}
+
 
 
 

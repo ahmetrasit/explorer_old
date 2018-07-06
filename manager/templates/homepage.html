@@ -9,10 +9,14 @@
   <div class="row">
 
 
-		{{intro_message}}
-		{% if no_of_samples < 1 %}
-			<button type="button" class="btn btn-lg btn-warning btn-block">Upload Data First</button>
+		{% if intro_message|length < 1 %}
+			<a href="/config/main" role="button" class="btn btn-lg btn-danger btn-block">Start Configuration<br><small>Better sooner than later</a>
+		{% else %}
+			{% if no_of_samples < 1 %}
+				<button type="button" class="btn btn-lg btn-warning btn-block">Upload Data First</button>
+			{%endif%}
 		{%endif%}
+
 
 
 	{% endblock %}

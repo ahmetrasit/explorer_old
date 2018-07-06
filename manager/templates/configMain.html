@@ -1,0 +1,93 @@
+{% extends 'templates/master.html' %}
+{% load static %}
+
+
+
+	<title>{% block title %}Edit Main Configuration{% endblock %}</title>
+
+	{% block body %}
+	<div class="container">
+		<div class="jumbotron">
+			<h1>Edit Main Configuration</h1>
+			<p>Only the last item in database is considered valid by system. The rest is for logging.</p>
+
+
+		<form method="post" action="/config/main">
+			{% csrf_token %}
+	    {{ form.management_form }}
+			<div class="row">
+				<div class="form-group col-md-1">
+				</div>
+		    {% for form_element in form %}
+						<div class="form-group col-md-2">
+
+							<label for="{{form_element.name}}">{{form_element.label}}</label>
+
+							{{form_element}}
+						</div>
+
+				{% endfor %}
+
+			</div>
+			<div class="row">
+				<div class="form-group col-md-1">
+				</div>
+				<div class="col-md-10 form-group">
+						<button type="submit" class="btn btn-sm btn-block btn-primary">Save configuration</button>
+				</div>
+			</div>
+
+		</form>
+
+		</div>
+		{% if 'success' in message%}
+			<div class="text-success">
+					{{message}}
+			</div>
+		{% else %}
+		<div class="text-warning">
+				{{message}}
+		</div>
+		{% endif %}
+	</div>
+
+	{% with configs|first as first %}
+		<div class="row">
+	    {% for field in first.fields %}
+			<div class="col-md-2">
+				<label><b>{{field}}</b></label>
+
+			</div>
+			{% endfor %}
+		</div>
+	{% endwith %}
+
+
+		{% for instance in configs %}
+			<div class="row">
+				{% for field, value in instance.fields.items %}
+					<div class="col-md-2">
+						{{value}}
+					</div>
+
+				{% endfor %}
+			</div>
+
+		{% endfor %}
+
+
+
+
+
+
+
+
+	{% endblock %}
+
+
+
+
+	{% block afterbody %}
+
+
+	{% endblock %}

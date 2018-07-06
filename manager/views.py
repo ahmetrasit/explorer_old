@@ -1,4 +1,5 @@
 from django.shortcuts import render, render_to_response
+from django.forms.models import model_to_dict
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -6,22 +7,61 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+
 from django.http import JsonResponse
-from manager.models import *
+from .models import *
+from .forms import *
 import os
 import re
 import time
 
 def homepage(request):
-    print(request.user)
-    no_of_samples = 0
-    user_notification = ''
-    return render(request, 'homepage.html', {'user':request.user, 'no_of_samples':no_of_samples, 'user_notification':user_notification})
+    render_dict = getConfigDict(request)
+    return render(request, 'homepage.html', render_dict)
+
+
+def editMainConfiguration(request):
+    try:
+        last = model_to_dict(MainConfiguration.objects.last())
+        del last['id']
+    except:
+        last = None
+    render_dict = getConfigDict(request)
+    form = MainConfigurationForm
+
+    render_dict['form']=form(initial=last)
+    if request.method == 'POST':
+        formInput = form(request.POST)
+        if formInput.is_valid():
+
+            if not last == formInput.cleaned_data:
+                formInput.save()
+                message = 'Main configuration successfully updated.'
+            else:
+                message = 'Nothing changed from previous state.'
+        else:
+            message = 'Input parameters are not valid, please check.'
+        render_dict['message'] = message
+    last = model_to_dict(MainConfiguration.objects.last())
+    render_dict['form']=form(initial=last)
+
+    render_dict['configs'] = serializers.serialize('python', MainConfiguration.objects.all())[::-1]
+
+    return render(request, 'configMain.html', render_dict)
+
+
+def getConfigDict(request):
+    render_dict = {'user':request.user, 'no_of_samples':0}
+    last = MainConfiguration.objects.last()
+    if last:
+        system_config = model_to_dict(last)
+        for key in ['team_name', 'intro_message']:
+            render_dict[key] = system_config[key]
+    return render_dict
 
 
 @csrf_exempt
 def createProcess(request):
-    print(request.POST.keys())
     print('db', Workflow.objects.all())
     if request.POST['bashProcessID'].strip() not in Workflow.objects.values_list('process_id', flat=True):
         try:
