@@ -9,11 +9,32 @@
   <div class="row">
 
 
+
 		{% if intro_message|length < 1 %}
-			<a href="/config/main" role="button" class="btn btn-lg btn-danger btn-block">Start Configuration<br><small>Better sooner than later</a>
+			{% if username == admin%}
+				<a href="/config/main" role="button" class="btn btn-lg btn-danger btn-block">Start Configuration<br><small>Better sooner than later</a>
+			{% else %}
+				<h3>System not configured yet. Please keep putting pressure on admin.</h3>
+			{% endif %}
 		{% else %}
-			{% if no_of_samples < 1 %}
-				<button type="button" class="btn btn-lg btn-warning btn-block">Upload Data First</button>
+			{% if user.username == "admin" %}
+					<a href="/add/user" role="button" class="btn btn-lg btn-warning btn-block">Add Users</a>
+					<h5>{{user_count_message}}</h5>
+					<div>sudo groupadd django_users</div>
+					<div>sudo adduser django_admin
+						<div class="">
+								<small>This user can create basic system users</small>
+						</div>
+						<div class="">
+								<small>django_admin ALL = NOPASSWD:adduser</small>
+						</div>
+
+					</div>
+					<p>add users through tool interface</p>
+			{% else %}
+				{% if no_of_samples < 1 %}
+					<button type="button" class="btn btn-lg btn-warning btn-block">Upload Data First</button>
+				{%endif%}
 			{%endif%}
 		{%endif%}
 

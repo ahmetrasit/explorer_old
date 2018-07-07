@@ -20,12 +20,16 @@
     <div class="fluid-container">
 
       <nav class="navbar navbar-expand-sm navbar-dark bg-secondary justify-content-center p-0 m-0">
-        <a class="navbar-brand text-center" href="/">Explore Data <small>{{ team_name }}</small></a>
+        <a class="navbar-brand text-center" href="/"> {{ team_name }} </a>
       </nav>
+
+
       <nav class="navbar navbar-expand-sm navbar-light bg-light p-0 mb-4">
         <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
           <div class="container pl-2">
             <div class="row">
+              {% if user.username == "admin" %}
+              {% else %}
               <ul class="navbar-nav mr-auto mt-1 mt-lg-0 pt-0">
                 <li class="nav-item  active">
                   <a class="nav-link" href="#" id="navbarDropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -49,21 +53,34 @@
                 </li>
 
               </ul>
+              {% endif %}
+
               <div class="nav-item">
                 {% if user.is_authenticated %}
-                <a class="nav-link pr-0 pb-1 pt-1" href="#" id="navbarDropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                  <button type="button" class="btn btn-sm btn-outline-secondary">
-                    {{user.username}} {{user.groups}} {{ user_rank }} <span class="badge badge-warning align-top" style="font-size:.5em">{{user_notification}}</span>
-                    <span class="sr-only">unread messages</span>
-                  </button>
 
-                </a>
+                  <a href="#">
+                    {{user.username}} {{ user_rank }}
+                  </a>
+                  <a href="#">
+                    <span class="badge badge-warning align-top" style="font-size:.5em">{{user_notification}}</span>
+                  </a>
+                  <a href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt"></i>
+                  </a>
+
                 {% else %}
-                <form class="form-inline my-sm-1">
-                  <input class="form-control form-control-sm mr-sm-1" type="username" placeholder="username" aria-label="username">
-                  <input class="form-control form-control-sm mr-sm-1" type="password" placeholder="password" aria-label="password">
+                <form class="form-inline my-sm-1" id="login-form" method="post" action="{% url 'login' %}">
+                  {% csrf_token %}
+                  <input class="form-control form-control-sm mr-sm-1" type="username" placeholder="username" aria-label="username" name="username">
+                  <input class="form-control form-control-sm mr-sm-1" type="password" placeholder="password" aria-label="password" name="password">
                   <button class="btn btn-sm btn-outline-success my-2 my-sm-0" type="submit">Login</button>
                 </form>
+                  {% if form.errors %}
+                      <p class=" label label-danger">
+                          Your username and password didn't match.
+                          Please try again.
+                      </p>
+                  {% endif %}
                 {% endif %}
               </div>
             </div>
@@ -86,6 +103,7 @@
           <div class="jumbotron">
             You need to login to explore your data.
           </div>
+
       {% endif %}
 
 

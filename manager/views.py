@@ -19,7 +19,32 @@ def homepage(request):
     render_dict = getConfigDict(request)
     return render(request, 'homepage.html', render_dict)
 
+@login_required
+def addUser(request):
+    render_dict = getConfigDict(request)
+    form = AddUserForm
+    render_dict['form']=form()
+    print()
+    if request.method == 'POST':
+        formInput = form(request.POST)
+        if formInput.is_valid():
+            if len(CustomUser.objects.filter(username=formInput['username'])) == 0:
+                formInput.save()
+                message = 'User successfully added.'
+            else:
+                message = 'User already exists.'
+        else:
+            message = 'Cannot create user.'
+        render_dict['message'] = message
+        render_dict['form']=formInput
 
+    users_fields = ['username', 'role', 'credit', 'score']
+    render_dict['users'] = CustomUser.objects.exclude(username='admin').values(*users_fields)[::-1]
+    render_dict['users_fields'] = users_fields
+    return render(request, 'addUser.html', render_dict)
+
+
+@login_required
 def editMainConfiguration(request):
     try:
         last = model_to_dict(MainConfiguration.objects.last())
@@ -28,12 +53,10 @@ def editMainConfiguration(request):
         last = None
     render_dict = getConfigDict(request)
     form = MainConfigurationForm
-
     render_dict['form']=form(initial=last)
     if request.method == 'POST':
         formInput = form(request.POST)
         if formInput.is_valid():
-
             if not last == formInput.cleaned_data:
                 formInput.save()
                 message = 'Main configuration successfully updated.'
@@ -42,16 +65,18 @@ def editMainConfiguration(request):
         else:
             message = 'Input parameters are not valid, please check.'
         render_dict['message'] = message
-    last = model_to_dict(MainConfiguration.objects.last())
+    try:
+        last = model_to_dict(MainConfiguration.objects.last())
+    except:
+        last=None
     render_dict['form']=form(initial=last)
-
     render_dict['configs'] = serializers.serialize('python', MainConfiguration.objects.all())[::-1]
-
     return render(request, 'configMain.html', render_dict)
 
 
 def getConfigDict(request):
     render_dict = {'user':request.user, 'no_of_samples':0}
+    #render_dict['login_form'] = PickyAuthenticationForm()
     last = MainConfiguration.objects.last()
     if last:
         system_config = model_to_dict(last)
