@@ -17,11 +17,15 @@
           <span class="btn-primary">Accepted inputs in blue</span>, <span class="btn-color-green-light">accepted outputs in green</span>, <span class="btn-danger">forbidden commands in red</span>, <i>types in italic</i>, and <b>names in bold</b>.
         </div>
         <hr>
+
+
         <div class="input-group">
           <div class="input-group-prepend">
             <span id="bash_script" class="input-group-text">Bash script:</span>
           </div>
-          <textarea class="form-control cp-user-input" name="bashProcessScript" rows="2" id="rawProcessCommand" onkeyup="checkCommand()" placeholder="Start writing your script here.">Example: cutadapt -a <i_sequence_barcode <f_fastq_input_file -o >f_fastq_output_file</textarea>
+          <div class="text-left form-control" name="analysisStepScript" id="analysisStepScript" onkeyup="checkScript('analysisStepScript')">
+            <span class="edit" style="outline:0 !important;" contenteditable>asdfead</span>
+          </div>
         </div>
 
 
@@ -35,7 +39,6 @@
             <div class="border" id="checkedCommand">
                 Start writing bash script above.
             </div>
-
           </div>
           <div class="col-12 mt-2">
             <div class="input-group mb-3">
@@ -71,51 +74,18 @@
 
 <script type="text/javascript">
 
-  function checkCommand() {
-    [atLeastOneIO, danger, checkedScript] = validateScript('rawProcessCommand')
-
-    document.getElementById('checkedCommand').innerHTML = checkedScript
-    $('#createBashProcess').prop('disabled', true)
-    if (danger) {
-      d3.select('#bash_script').attr('class', 'input-group-text btn-color-red')
-    }else if (atLeastOneIO) {
-      d3.select('#bash_script').attr('class', 'input-group-text btn-color-green')
-      scriptValid = true
-      checkAllInputs('cp-user-input')
-
-    }else {
-      d3.select('#bash_script').attr('class', 'input-group-text btn-color-gray-light')
+  function checkScript(script_id) {
+    latest_script = htmlDecode($('#'+script_id+' .edit:last')[0].innerHTML)
+    //script = $('#analysisStepScript .edit:last')
+    if (script.match('&[gl]t;$')) {
+      console.log('>>',  htmlDecode(script));
+      console.log(script.slice(-2));
     }
+
   }
 
   function validateScript(script_id){
-    var atLeastOneIO = false
-    var danger = false
-    //script_id = 'rawProcessCommand'
-    cmd = document.getElementById(script_id).value
-    cmd_list = cmd.split(/\s+/)
-    checked = []
-    for (var i = 0; i < cmd_list.length; i++) {
-      curr = cmd_list[i]
-      if (curr.match(/^<[ifds]_[\w-]+_[a-zA-Z_-]+/)) {
-        parts = curr.split("_")
-        checked.push('<mark class="btn-primary">' + parts[0].replace("<", "&lt;") + '_<i>' + parts[1] + "</i>_<b>" + parts.slice(2).join("_") + "</b></mark>")
-        atLeastOneIO = true
-      }else if (curr.match(/^>[ifds]_[\w-]+_[a-zA-Z_-]+/)) {
-        parts = curr.split("_")
-        checked.push('<mark class="btn-color-green-light">' + parts[0] + '_<i>' + parts[1] + "</i>_<b>" + parts.slice(2).join("_") + "</b></mark>")
-        atLeastOneIO = true
-      }else if (curr.match(/^-p_[\w-]+/)) {//parameters like n of threads
-        parts = curr.split("_")
-        checked.push('<mark class="btn-color-yellow">' + parts[0] + '_<i>' + parts[1] + "</i>" + "</b></mark>")
-      }else if (curr=='rm' || curr=='mv' || curr.match('/')) {
-        checked.push('<mark class="btn-danger">' + curr.replace("<", "&lt;") +  "</mark>")
-        danger = true
-      }else {
-        checked.push(curr.replace("<", "&lt;"))
-      }
-    }
-    return [atLeastOneIO, danger, checked.join(" ")]
+
   }
 
   function checkAllInputs(classname) {
@@ -135,6 +105,12 @@
     }else {
       $('#createBashProcess').prop('disabled', true)
     }
+  }
+
+  function htmlDecode(input){
+    var e = document.createElement('div');
+    e.innerHTML = input;
+    return e.childNodes[0].nodeValue;
   }
 
   //checkCommand()

@@ -32,7 +32,7 @@
               {% else %}
               <ul class="navbar-nav mr-auto mt-1 mt-lg-0 pt-0">
                 <li class="nav-item  active">
-                  <a class="nav-link" href="#" id="navbarDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                  <a class="nav-link" href="#fileUploadModal" id="navbarDropdown" data-toggle="modal" role="button" aria-haspopup="true" aria-expanded="false">
                     Upload Data
                   </a>
                 </li>
@@ -46,7 +46,7 @@
                     Build
                   </a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Add Analysis Step</a>
+                    <a class="dropdown-item" data-toggle="modal" href="#createProcessModal">Add Analysis Step</a>
                     <a class="dropdown-item" href="#">Add Protocol</a>
                     <a class="dropdown-item" href="#">Create Reference Data</a>
                   </div>
@@ -96,6 +96,9 @@
 
     <div class="container text-center">
       {% if user.is_authenticated %}
+        {% include "templates/_file_upload_modal.html" %}
+        {% include "templates/_create_process_modal.html" %}
+
 
         {% block body %}{% endblock %}
       {% else %}
