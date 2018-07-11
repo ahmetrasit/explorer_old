@@ -8,11 +8,29 @@
         </button>
       </div>
       <div class="modal-body">
-        {% include "templates/file_upload_progress_bar_modal.html" %}
-        <hr>
-        {% include "templates/multiple_files_content_type_modal.html" %}
-        <hr>
-        {% include "templates/preprocessing_protocols_modal.html" %}
+
+
+        <div class="input-group mb-3">
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" id="file-select" name="filesToUpload" multiple>
+            <label id="file_label" class="custom-file-label text-left" for="inputGroupFile02">Please select file(s) to upload</label>
+          </div>
+        </div>
+        <div class="progress" id="progress-bar-container">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;" id="progressbar"></div>
+        </div>
+
+
+        <div class="input-group mb-3 noof_inputs" id='single_input' style="display:none">
+          single
+        </div>
+
+
+        <div class="input-group mb-3 noof_inputs" id='multiple_inputs' style="display:none">
+          multi
+        </div>
+
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

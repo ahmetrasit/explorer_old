@@ -14,6 +14,7 @@ from .forms import *
 import os
 import re
 import time
+import random
 
 def homepage(request):
     render_dict = getConfigDict(request)
@@ -24,15 +25,14 @@ def addUser(request):
     render_dict = getConfigDict(request)
     form = AddUserForm
     render_dict['form']=form()
-    print()
     if request.method == 'POST':
         formInput = form(request.POST)
         if formInput.is_valid():
-            if len(CustomUser.objects.filter(username=formInput['username'])) == 0:
+            if createSystemUser(formInput.cleaned_data["username"]):
                 formInput.save()
-                message = 'User successfully added.'
+                message = 'User successfully added'
             else:
-                message = 'User already exists.'
+                message = "cannot create system user"
         else:
             message = 'Cannot create user.'
         render_dict['message'] = message
@@ -42,6 +42,11 @@ def addUser(request):
     render_dict['users'] = CustomUser.objects.exclude(username='admin').values(*users_fields)[::-1]
     render_dict['users_fields'] = users_fields
     return render(request, 'addUser.html', render_dict)
+
+
+def createSystemUser(username):
+    print(username)
+    return False
 
 
 @login_required
@@ -150,30 +155,23 @@ def getParameters(script):
 	return ';'.join(parameters)
 
 
-
-
-
-#@login_required
 @csrf_exempt
 def uploadFASTQ(request):
+    success = False
     if request.method == 'POST':
         for i in range(len(request.FILES.getlist('filesToUpload'))):
             file = request.FILES.getlist('filesToUpload')[i]
             filename = str(file)
-            handle_uploaded_file(file, filename, request.user.username)
+            random_folder = str(int(time.time())) + str(random.randint(111111, 999999)) + '/'
+            success = success and handle_uploaded_file(file, filename, random_folder, request.user.username)
     return HttpResponse()
 
 
 @csrf_exempt
-def handle_uploaded_file(f, filename, username):
+def handle_uploaded_file(f, filename, random_folder, username):
     print(os.getcwd(), os.listdir('./'))
-    try:
-        print(os.getcwd(), os.listdir('./'))
-        os.makedirs('static/upload/' + username)
-        os.makedirs('static/upload/' + username + '/' + 'csv')
-        os.makedirs('static/upload/' + username + '/' + 'userdata')
-    except:
-        pass
-    with open('static/upload/' + username + '/'+ filename, 'wb+') as destination:
+    os.mkdir('static/temporary/' + random_folder)
+    with open('static/temporary/' + random_folder + filename, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+    return True

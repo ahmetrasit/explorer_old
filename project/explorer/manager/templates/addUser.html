@@ -61,10 +61,10 @@
 
 	</div>
 
+	{% for user in users %}
 	<div class="row">
 		<div class="col-md-1">
 		</div>
-    {% for user in users %}
 			{% for key,value in user.items %}
 				<div class="col-md-2">
 					{{value}}
@@ -73,8 +73,9 @@
 				<div class="col-md-2">
 					edit
 				</div>
-			{% endfor %}
 	</div>
+	{% endfor %}
+
 
 
 

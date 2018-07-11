@@ -33,11 +33,16 @@
 					<p>add users through tool interface</p>
 			{% else %}
 				{% if no_of_samples < 1 %}
-					<button type="button" class="btn btn-lg btn-warning btn-block">Upload Data First, please</button>
+					<button type="button" class="btn btn-lg btn-color-dark btn-block" data-toggle="modal" data-target="#fileUploadModal">Upload Data First to Start</button>
+				{% else %}
+					<button type="button" class="btn btn-lg btn-color-dark btn-block" data-toggle="modal" data-target="#fileUploadModal">Upload Data</button>
 				{%endif%}
 			{%endif%}
 		{%endif%}
 
+
+
+		{% include "templates/_file_upload_modal.html" %}
 
 
 	{% endblock %}
