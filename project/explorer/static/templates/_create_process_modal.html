@@ -23,10 +23,8 @@
           <div class="input-group-prepend">
             <span id="bash_script" class="input-group-text">Bash script:</span>
           </div>
-          <div class="text-left form-control" name="analysisStepScript" id="analysisStepScript" onkeyup="checkScript('analysisStepScript')">
-            <span class="edit" style="outline:0 !important;" contenteditable>
-                &nbsp;
-            </span>
+          <div class="text-left form-control" onkeyup="checkScript('analysisStepScript')">
+            <span id="analysisStepScript" class="edit" style="outline:0 !important;" contenteditable>&nbsp;</span>
           </div>
         </div>
 
@@ -150,10 +148,8 @@
 
   function updateSelect2() {
     var select = document.getElementById('io_options')
-    console.log(select);
     var selected_value = select.options[select.selectedIndex].value;
     var cmd_fields = input_types[selected_value].split('_')
-    console.log(cmd_fields);
     if (cmd_fields.slice(-1)=='value') {
       var select = document.getElementById('io_inputfieldselect')
       var selected_value = select.options[select.selectedIndex].value;
@@ -188,7 +184,7 @@
       d3.select('#io_inputfield').style('display', 'block')
       d3.select('#io_inputfieldinput').attr('placeholder', 'Provide a user dialogue value')
     }else {
-      console.log(('wrong config'));
+      alert('Wrong/missing configuration, please contact admin');
     }
   }
 
@@ -199,11 +195,10 @@
   }
 
   function saveAddInCmd(script_id) {
-    var cmd = ''
+    var cmd = '&lt;'
     var select = document.getElementById('io_options')
     var selected_value = select.options[select.selectedIndex].value;
     cmd += selected_value
-    //console.log(selected_value);
     cmd_fields = input_types[selected_value].split('_')
     if (cmd_fields[0]=='s') {
       var select = document.getElementById('io_inputfieldselect')
@@ -215,32 +210,38 @@
           var selected_value = select.options[select.selectedIndex].value;
           cmd += '_' + selected_value
         }
-        console.log(cmd);
+        document.getElementById('analysisStepScript').innerHTML = document.getElementById('analysisStepScript').innerHTML.replace("@&lt;", cmd)
+
       }else if (cmd_fields[2]=='name') {
         var input_value = document.getElementById('io_inputfieldinput').value.trim().replace(/\W+/g, '-')
-        cmd += '_' + input_value
-        console.log(cmd);
+        if (input_value.length < 3) {
+          alert('Please provide at least 3 characters long input.')
+        }else {
+          cmd += '_' + input_value
+          document.getElementById('analysisStepScript').innerHTML = document.getElementById('analysisStepScript').innerHTML.replace("@&lt;", cmd)
+        }
       }else {
-        console.log('something is wrong');
+        alert('Something wrong, please contact admin');
       }
 
     }else if (cmd_fields[0]=='i') {
       var input_value = document.getElementById('io_inputfieldinput').value.trim().replace(/\W+/g, '-')
-      cmd += '_' + input_value
-      console.log(cmd);
+      if (input_value.length < 3) {
+        alert('Please provide at least 3 characters long input.')
+      }else {
+        cmd += '_' + input_value
+        document.getElementById('analysisStepScript').innerHTML = document.getElementById('analysisStepScript').innerHTML.replace("@&lt;", cmd)
+      }
     }else {
-      console.log('something wrong');
+      alert('Something wrong, please contact admin');
     }
 
-    latest_script = $('#'+script_id+' .edit:last')[0].innerHTML
   }
 
 
   function checkScript(script_id) {
-    console.log(script_id);
-    latest_script = $('#'+script_id+' .edit:last')[0].innerHTML
-    //script = $('#analysisStepScript .edit:last')
-    if (latest_script.match('@&[gl]t;')) {
+    latest_script = document.getElementById('analysisStepScript').innerHTML
+    if (latest_script.match('@&lt;')) {
       humanize()
     }
 
