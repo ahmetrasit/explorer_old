@@ -1,0 +1,96 @@
+{% extends 'templates/master.html' %}
+{% load static %}
+
+
+
+	<title>{% block title %}Create Major Data Category{% endblock %}</title>
+
+	{% block body %}
+	<div class="container">
+		<div class="jumbotron">
+			<h1>Create Major Data Category</h1>
+			<p>You can add major data categories to make data exploration more intuitive. Just think about intermediatery data points that might benefit from a branching what-if analysis.</p>
+		<form method="post" action="/add/dataCategory">
+			{% csrf_token %}
+	    {{ form.management_form }}
+			<div class="row">
+		    {% for form_element in form %}
+						<div class="form-group col-md-2">
+							<label style="font-size:.8em" for="{{form_element.name}}">{{form_element.label}}</label>
+							{{form_element}}
+							{% for error in form_element.errors %}
+									<div class="alert alert-danger">
+											<strong>{{ error|escape }}</strong>
+									</div>
+							{% endfor %}
+						</div>
+				{% endfor %}
+			</div>
+
+			<div class="row">
+				<div class="col-md-12 form-group">
+						<button type="submit" class="btn btn-sm btn-block btn-primary">Create Data Category</button>
+				</div>
+			</div>
+
+		</form>
+
+		</div>
+		{% if 'success' in message%}
+			<div class="text-success">
+					{{message}}
+			</div>
+		{% else %}
+		<div class="text-warning">
+				{{message}}
+		</div>
+		{% endif %}
+	</div>
+
+
+
+
+	<div class="row">
+		<div class="col-md-1">
+		</div>
+    {% for field in data_category_fields %}
+		<div class="col-md-2">
+			<label><b>{{field|title }}</b></label>
+		</div>
+		{% endfor %}
+
+	</div>
+
+	{% for category in data_categories %}
+	<div class="row">
+		<div class="col-md-1">
+		</div>
+			{% for key,value in category.items %}
+				<div class="col-md-2">
+					{{value}}
+				</div>
+				{% endfor %}
+				<div class="col-md-2">
+					edit
+				</div>
+	</div>
+	{% endfor %}
+
+
+
+
+
+
+
+
+
+
+	{% endblock %}
+
+
+
+
+	{% block afterbody %}
+
+
+	{% endblock %}
