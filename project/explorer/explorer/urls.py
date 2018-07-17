@@ -16,6 +16,9 @@ urlpatterns = [
     url(r'^$', manager_views.homepage, name='homepage'),
     url(r'^config/main$', manager_views.editMainConfiguration, name='editMainConfiguration'),
     url(r'^add/user$', manager_views.addUser, name='addUser'),
+    url(r'^add/dataCategory$', manager_views.addDataCategory, name='addDataCategory'),
+    url(r'^add/step$', manager_views.addStep, name='addStep'),
+    
     url(r'^login/$', auth_views.login, {'template_name': 'homepage.html'}),
     url(r'^uploadFASTQ/$', manager_views.uploadFASTQ, name='uploadFASTQ'),
     url(r'^createProcess/$', manager_views.createProcess, name='createProcess'),

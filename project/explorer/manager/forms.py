@@ -1,6 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 
 from django.forms import ModelForm
+from django import forms
 from .models import *
 from django.db import models
 
@@ -15,7 +16,45 @@ class MainConfigurationForm(ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control',
                 'id':field,
-                'rows':'1'
+                'rows':'1',
+                'autocomplete':'none'
+        })
+
+
+class StepForm(ModelForm):
+    raw_script = forms.CharField(widget=forms.HiddenInput(), required=False)
+    class Meta:
+        model = Step
+        fields = ['raw_script', 'short_name', 'description', 'access_list', 'status', 'special', 'created_for']
+
+
+    def __init__(self, *args, **kwargs):
+        widths = {'category':3, 'description':9}
+        super().__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control',
+                'id':field,
+                'rows':'1',
+                'autocomplete':'none'
+        })
+
+
+class MajorDataCategoryForm(ModelForm):
+    class Meta:
+        model = MajorDataCategory
+        fields = ['category', 'description']
+
+
+    def __init__(self, *args, **kwargs):
+        widths = {'category':3, 'description':9}
+        super().__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control',
+                'id':field,
+                'rows':'1',
+                'autocomplete':'none'
         })
 
 
@@ -30,4 +69,5 @@ class AddUserForm(UserCreationForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control',
                 'id':field,
+                'autocomplete':'none'
         })

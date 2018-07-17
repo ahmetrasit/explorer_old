@@ -15,9 +15,10 @@
 	    {{ form.management_form }}
 			<div class="row">
 		    {% for form_element in form %}
-						<div class="form-group col-md-2">
+						<div class="form-group col-md-6">
 							<label style="font-size:.8em" for="{{form_element.name}}">{{form_element.label}}</label>
 							{{form_element}}
+
 							{% for error in form_element.errors %}
 									<div class="alert alert-danger">
 											<strong>{{ error|escape }}</strong>
@@ -36,25 +37,28 @@
 		</form>
 
 		</div>
-		{% if 'success' in message%}
-			<div class="text-success">
-					{{message}}
-			</div>
-		{% else %}
-		<div class="text-warning">
-				{{message}}
+		<div class="col-md-12 text-center">
+			{% if 'success' in message%}
+				<div class="text-success">
+						{{message}}
+				</div>
+			{% else %}
+				<div class="text-warning">
+						{{message}}
+				</div>
+			{% endif %}
 		</div>
-		{% endif %}
+
 	</div>
 
 
 
 
 	<div class="row">
-		<div class="col-md-1">
+		<div class="col-md-2">
 		</div>
     {% for field in data_category_fields %}
-		<div class="col-md-2">
+		<div class="col-md-4">
 			<label><b>{{field|title }}</b></label>
 		</div>
 		{% endfor %}
@@ -63,10 +67,10 @@
 
 	{% for category in data_categories %}
 	<div class="row">
-		<div class="col-md-1">
+		<div class="col-md-2">
 		</div>
 			{% for key,value in category.items %}
-				<div class="col-md-2">
+				<div class="col-md-4">
 					{{value}}
 				</div>
 				{% endfor %}

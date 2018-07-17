@@ -3,56 +3,78 @@
 
 
 
-	<title>{% block title %}Create Analysis Step{% endblock %}</title>
+	<title>{% block title %}Create Major Data Category{% endblock %}</title>
 
 	{% block body %}
 	<div class="container">
 		<div class="jumbotron">
-			<h1>Create Analysis</h1>
-			<p>An analysis step transforms data from a data category to another one. Just think about it as a step in a data analysis protocol. Try to avoid writing a whole protocol: just write the simplest analysis step that also allows branching.</p>
-		<form method="post" action="/add/step">
-			{% csrf_token %}
-	    {{ form.management_form }}
+			<h1>Create Major Data Category</h1>
+			<p>You can add major data categories to make data exploration more intuitive. Just think about intermediatery data points that might benefit from a branching what-if analysis.</p>
+
 			<div class="row">
-		    {% for form_element in form %}
-						<div class="form-group col-md-2">
-							<label style="font-size:.8em" for="{{form_element.name}}">{{form_element.label}}</label>
-							{{form_element}}
-							{% for error in form_element.errors %}
-									<div class="alert alert-danger">
-											<strong>{{ error|escape }}</strong>
+				<div class="col-md-12">
+					<form method="post" action="/add/step">
+						{% csrf_token %}
+						{{ step_form.management_form }}
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span id="bash_script" class="input-group-text">Bash script:</span>
+							</div>
+							<div style="outline:0 !important" class="text-left form-control" onkeyup="checkScript('analysisStepScript')" name="script" id="script" required>
+								<span id="analysisStepScript" class="edit" style="outline:0 !important;" contenteditable>&nbsp;</span>
+							</div>
+							<input type="hidden" name="script" id="script" value='hidden script' >
+							asdfasdf
+						</div>
+						<div class="row">
+							{% for form_element in step_form.visible_fields %}
+									<div class="form-group col-md-6">
+										<label style="font-size:.8em" for="{{form_element.name}}">{{form_element.label}}</label>
+										{{form_element}}
+
+										{% for error in form_element.errors %}
+												<div class="alert alert-danger">
+														<strong>{{ error|escape }}</strong>
+												</div>
+										{% endfor %}
 									</div>
 							{% endfor %}
+							{% for form_element in step_form.hidden_fields %}
+										{{form_element}}
+							{% endfor %}
 						</div>
-				{% endfor %}
-			</div>
 
-			<div class="row">
-				<div class="col-md-12 form-group">
-						<button type="submit" class="btn btn-sm btn-block btn-primary">Create Analysis Step</button>
+						<div class="row">
+							<div class="col-md-12 form-group">
+									<button type="submit" class="btn btn-sm btn-block btn-primary">Create Data Category</button>
+							</div>
+						</div>
+					</form>
+
 				</div>
+
+
 			</div>
 
-		</form>
+		</div>
+		<div class="col-md-12 text-center">
+			{% if 'success' in message%}
+				<div class="text-success">
+						{{message}}
+				</div>
+			{% else %}
+				<div class="text-warning">
+						{{message}}
+				</div>
+			{% endif %}
+		</div>
 
-		</div>
-		{% if 'success' in message%}
-			<div class="text-success">
-					{{message}}
-			</div>
-		{% else %}
-		<div class="text-warning">
-				{{message}}
-		</div>
-		{% endif %}
 	</div>
 
 
 
 
 	<div class="row">
-		<div class="col-md-1">
-		</div>
     {% for field in step_fields %}
 		<div class="col-md-2">
 			<label><b>{{field|title }}</b></label>
@@ -63,16 +85,12 @@
 
 	{% for step in steps %}
 	<div class="row">
-		<div class="col-md-1">
-		</div>
-			{% for key,value in category.items %}
+			{% for key,value in step.items %}
 				<div class="col-md-2">
 					{{value}}
 				</div>
 				{% endfor %}
-				<div class="col-md-2">
-					edit
-				</div>
+
 	</div>
 	{% endfor %}
 

@@ -30,7 +30,7 @@ class MajorDataCategory(models.Model):
 
 
 class Step(models.Model):
-    USERS = ((user,user) for user in CustomUser.objects.values_list('username', flat=True))
+    USERS = ((user,user) for user in CustomUser.objects.values_list('username', flat=True) if user != 'admin')
     ACCESS = ((access, access) for access in ('public', 'private'))
     STATUS = ((status, status) for status in ('tested', 'experimental'))
 
@@ -42,7 +42,7 @@ class Step(models.Model):
     special = models.CharField(max_length=256)
     script = models.TextField()
 
-    creator_username = models.CharField(max_length=256)
+    created_by = models.CharField(max_length=256)
     subfolder_path = models.CharField(max_length=256)
     dependencies = models.TextField()
     input_major_data_category = models.CharField(max_length=128)

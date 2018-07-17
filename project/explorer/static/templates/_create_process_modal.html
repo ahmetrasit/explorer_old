@@ -1,6 +1,6 @@
 {% load static %}
 
-<!-- <div class="modal fade" id="createProcessModal" tabindex="-1" role="dialog" aria-labelledby="createProcessModal" aria-hidden="true">
+<div class="modal fade" id="createProcessModal" tabindex="-1" role="dialog" aria-labelledby="createProcessModal" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -10,67 +10,56 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="col-12 smaller-font">
-          <div class="h4">
-            Mark-up rules:
-          </div>
-          <span class="btn-primary">Accepted inputs in blue</span>, <span class="btn-color-green-light">accepted outputs in green</span>, <span class="btn-danger">forbidden commands in red</span>, <i>types in italic</i>, and <b>names in bold</b>.
-        </div>
-        <hr>
-
--->
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span id="bash_script" class="input-group-text">Bash script:</span>
-          </div>
-          <div class="text-left form-control" onkeyup="checkScript('analysisStepScript')">
-            <span id="analysisStepScript" class="edit" style="outline:0 !important;" contenteditable>&nbsp;</span>
-          </div>
-        </div>
-
-
         <div class="row">
-          <div class="col-12 smaller-font">
-            <div class="h4 mt-4">
-              Interpreted script:
-            </div>
-          </div>
-          <div class="col-12 mt-1">
-            <div class="border" id="checkedCommand">
-                Start writing bash script above.
-            </div>
-          </div>
-          <div class="col-12 mt-2">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon3">Process id:</span>
+          <div class="col-md-12">
+            <form method="post" action="/add/step" onsubmit="checkAndPopulateFields()" id='step_form'>
+              {% csrf_token %}
+              {{ step_form.management_form }}
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span id="bash_script" class="input-group-text">Bash script:</span>
+                </div>
+                <div style="outline:0 !important" class="text-left form-control" onkeyup="checkScript('analysisStepScript')" name="script" id="script" required>
+                  <span id="analysisStepScript" class="edit" style="outline:0 !important;" contenteditable>&nbsp;</span>
+                </div>
+                <input type="hidden" name="script" >
               </div>
-              <input type="text" placeholder="Short id (<20 characters) without any space, unique" class="form-control cp-user-input" name="bashProcessID" id="bashProcessID" aria-describedby="bashProcessID" onkeyup="checkAllInputs('cp-user-input')">
-            </div>
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon3">Short process name:</span>
+              <div class="row">
+                {% for form_element in step_form.visible_fields %}
+  									<div class="form-group col-md-6">
+  										<label style="font-size:.8em" for="{{form_element.name}}">{{form_element.label}}</label>
+  										{{form_element}}
+
+  										{% for error in form_element.errors %}
+  												<div class="alert alert-danger">
+  														<strong>{{ error|escape }}</strong>
+  												</div>
+  										{% endfor %}
+  									</div>
+  							{% endfor %}
+  							{% for form_element in step_form.hidden_fields %}
+  										{{form_element}}
+  							{% endfor %}
               </div>
-              <input type="text" placeholder="Like a process title" class="form-control cp-user-input" name="bashProcessName" id="processName" aria-describedby="bashProcessName" onkeyup="checkAllInputs('cp-user-input')">
-            </div>
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon3">Description:</span>
+
+              <div class="row">
+                <div class="col-md-12 form-group">
+                    <button type="submit" class="btn btn-sm btn-block btn-primary">Create Data Category</button>
+                </div>
               </div>
-              <input type="text" placeholder="Long process desription" class="form-control cp-user-input" id="bashProcessDescription" aria-describedby="bashProcessDescription" name="bashProcessDescription" onkeyup="checkAllInputs('cp-user-input')">
-            </div>
-          </div>
-          <div class="col-md-12" id="cp-message">
+            </form>
           </div>
         </div>
+
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button disabled type="button" class="btn btn-primary" id="createBashProcess" onclick="createBashProcess()">Create Bash Process</button>
       </div>
     </div>
   </div>
 </div>
+
 
 
 <div class="modal" id="addPlaceholder" tabindex="-1" role="dialog">
@@ -188,11 +177,13 @@
     }
   }
 
+
   function createInputFieldForInputType(action) {
     d3.selectAll('.inputs').style('display', 'none')
     select_field = 'io_inputfield'
     d3.select('#io_inputfield').style('display', 'block')
   }
+
 
   function saveAddInCmd(script_id) {
     var cmd = '&lt;'
@@ -211,7 +202,7 @@
           cmd += '_' + selected_value
         }
         document.getElementById('analysisStepScript').innerHTML = document.getElementById('analysisStepScript').innerHTML.replace("@&lt;", cmd)
-
+        $('#addPlaceholder').modal('hide')
       }else if (cmd_fields[2]=='name') {
         var input_value = document.getElementById('io_inputfieldinput').value.trim().replace(/\W+/g, '-')
         if (input_value.length < 3) {
@@ -219,6 +210,7 @@
         }else {
           cmd += '_' + input_value
           document.getElementById('analysisStepScript').innerHTML = document.getElementById('analysisStepScript').innerHTML.replace("@&lt;", cmd)
+          $('#addPlaceholder').modal('hide')
         }
       }else {
         alert('Something wrong, please contact admin');
@@ -231,19 +223,23 @@
       }else {
         cmd += '_' + input_value
         document.getElementById('analysisStepScript').innerHTML = document.getElementById('analysisStepScript').innerHTML.replace("@&lt;", cmd)
+        $('#addPlaceholder').modal('hide')
       }
     }else {
       alert('Something wrong, please contact admin');
     }
+
 
   }
 
 
   function checkScript(script_id) {
     latest_script = document.getElementById('analysisStepScript').innerHTML
+
     if (latest_script.match('@&lt;')) {
       humanize()
     }
+    document.getElementById('raw_script').value = document.getElementById('analysisStepScript').innerHTML
 
   }
 
@@ -274,6 +270,13 @@
   function validateScript(script_id){
 
   }
+
+
+  function checkAndPopulateFields() {
+//
+
+  }
+
 
   function checkAllInputs(classname) {
     var haveInput = true

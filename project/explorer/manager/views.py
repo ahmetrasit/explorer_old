@@ -15,10 +15,48 @@ import os
 import re
 import time
 import random
+import json
+import html
+
 
 def homepage(request):
     render_dict = getConfigDict(request)
+    render_dict['step_form'] = StepForm()
     return render(request, 'homepage.html', render_dict)
+
+
+@login_required
+def addStep(request):
+    render_dict = getConfigDict(request)
+    form = StepForm
+    render_dict['step_form']=form()
+    if request.method == 'POST':
+        formInput = form(request.POST)
+        print(request.user.username)
+        if formInput.is_valid():
+            temp_form = formInput.save(commit=False)
+            temp_form.created_by = request.user.username
+            print(formInput.cleaned_data)
+            temp_form.input_major_data_category, temp_form.output_major_data_category = getScriptInputOutputCategory(formInput.cleaned_data['raw_script'])
+            temp_form.save()
+
+            message = 'Step successfully added'
+        else:
+            message = 'Cannot create step.'
+        render_dict['message'] = message
+        render_dict['step_form']=formInput
+
+    step_fields = ['short_name', 'created_for', 'access_list', 'description', 'status', 'special', 'created_by']
+    render_dict['steps'] = Step.objects.all().values(*step_fields)[::-1]
+    render_dict['step_fields'] = step_fields
+    return render(request, 'addStep.html', render_dict)
+
+
+def getScriptInputOutputCategory(script):
+    script = html.unescape(script)
+
+
+
 
 @login_required
 def addUser(request):
@@ -42,6 +80,30 @@ def addUser(request):
     render_dict['users'] = CustomUser.objects.exclude(username='admin').values(*users_fields)[::-1]
     render_dict['users_fields'] = users_fields
     return render(request, 'addUser.html', render_dict)
+
+
+@login_required
+def addDataCategory(request):
+    render_dict = getConfigDict(request)
+    form = MajorDataCategoryForm
+
+    render_dict['form']=form()
+    if request.method == 'POST':
+        formInput = form(request.POST)
+        if formInput.is_valid():
+            formInput.save()
+            message = 'Data category successfully added'
+        else:
+            message = 'Cannot add data category'
+
+        render_dict['message'] = message
+        render_dict['form']=formInput
+
+    data_category_fields = ['category', 'description']
+    render_dict['data_categories'] = MajorDataCategory.objects.all().values(*data_category_fields)[::-1]
+    render_dict['data_category_fields'] = data_category_fields
+    return render(request, 'addDataCategory.html', render_dict)
+
 
 
 def createSystemUser(username):
