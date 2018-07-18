@@ -21,7 +21,7 @@ import html
 
 def homepage(request):
     render_dict = getConfigDict(request)
-    render_dict['step_form'] = StepForm()
+    render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular'})
     return render(request, 'homepage.html', render_dict)
 
 
@@ -29,7 +29,7 @@ def homepage(request):
 def addStep(request):
     render_dict = getConfigDict(request)
     form = StepForm
-    render_dict['step_form']=form()
+    render_dict['step_form']=form(initial={'access_list': 'public', 'status':'tested', 'special':'regular'})
     if request.method == 'POST':
         formInput = form(request.POST)
         print(request.user.username)
@@ -37,7 +37,7 @@ def addStep(request):
             temp_form = formInput.save(commit=False)
             temp_form.created_by = request.user.username
             print(formInput.cleaned_data)
-            temp_form.input_major_data_category, temp_form.output_major_data_category = getScriptInputOutputCategory(formInput.cleaned_data['raw_script'])
+            temp_form.input_major_data_category, temp_form.output_major_data_category, temp_form.script = getScriptInputOutputCategory(formInput.cleaned_data['raw_script'])
             temp_form.save()
 
             message = 'Step successfully added'
@@ -52,8 +52,19 @@ def addStep(request):
     return render(request, 'addStep.html', render_dict)
 
 
-def getScriptInputOutputCategory(script):
-    script = html.unescape(script)
+
+
+def getScriptInputOutputCategory(raw_script):
+    script = html.unescape(raw_script)
+    script = re.sub(r'<\/?span[^>]*>', '', script)
+    script = re.sub(r'<\/?p[^_>]*>', '', script)
+    print(script)
+    inputs = re.findall(r'(<[fsid][smyp]_[\w.-]+)\W', script)
+    input_major_data_category = '_|_'.join([re.sub(r'^<\w\w_', '', curr) for curr in inputs if re.match('<f', curr)])
+    outputs = re.findall(r'(>[f]_[\w.-]+)\W', script)
+    output_major_data_category = '_|_'.join([re.sub(r'^>f_', '', curr) for curr in outputs if re.match('>f', curr)])
+
+    return input_major_data_category, output_major_data_category, script
 
 
 

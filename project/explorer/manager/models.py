@@ -33,13 +33,14 @@ class Step(models.Model):
     USERS = ((user,user) for user in CustomUser.objects.values_list('username', flat=True) if user != 'admin')
     ACCESS = ((access, access) for access in ('public', 'private'))
     STATUS = ((status, status) for status in ('tested', 'experimental'))
+    SPECIAL = ((special, special) for special in ('regular', 'upload', 'public', 'other'))
 
     short_name = models.CharField(max_length=64, unique=True)
     created_for = models.CharField(max_length=256, choices=USERS, blank=True, null=True)
     access_list = models.CharField(max_length=2048, choices=ACCESS)
     description = models.CharField(max_length=2048)
     status = models.CharField(max_length=256, choices=STATUS)
-    special = models.CharField(max_length=256)
+    special = models.CharField(max_length=256, choices=SPECIAL)
     script = models.TextField()
 
     created_by = models.CharField(max_length=256)

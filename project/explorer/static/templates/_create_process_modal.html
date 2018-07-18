@@ -20,7 +20,7 @@
                   <span id="bash_script" class="input-group-text">Bash script:</span>
                 </div>
                 <div style="outline:0 !important" class="text-left form-control" onkeyup="checkScript('analysisStepScript')" name="script" id="script" required>
-                  <span id="analysisStepScript" class="edit" style="outline:0 !important;" contenteditable>&nbsp;</span>
+                  <span id="analysisStepScript" class="edit" style="outline:0 !important;" contenteditable>&nbsp;></span>
                 </div>
                 <input type="hidden" name="script" >
               </div>
@@ -118,7 +118,7 @@
   var input_types = {
     'fs':'s_major_value',
     'fm':'s_major_value',
-    's' :'s_parameter_value',
+    'sy':'s_parameter_value',
     'is':'i_value',
     'ip':'i_name',
     'ds':'s_type_value',
@@ -128,7 +128,7 @@
   var input_descriptions = {
     'fs':'One single file at a time for one or more selected files',
     'fm':'All selected files at the same time',
-    's' :'System parameter like available CPU, etc.',
+    'sy' :'System parameter, like available CPU, etc.',
     'is':'Hardcoded text input',
     'ip':'Text input that will be entered just before submitting a task',
     'ds':'Reference file to be selected right now',
