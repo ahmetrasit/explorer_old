@@ -21,19 +21,25 @@ class MainConfigurationForm(ModelForm):
         })
 
 
+
+
 class StepForm(ModelForm):
     raw_script = forms.CharField(widget=forms.HiddenInput(), required=False)
     class Meta:
         model = Step
-        fields = ['raw_script', 'short_name', 'description', 'access_list', 'status', 'special', 'created_for']
+        fields = ['raw_script', 'short_name', 'description', 'no_of_outputs', 'sample_schema', 'access_list', 'status', 'special', 'created_for']
+
 
 
     def __init__(self, *args, **kwargs):
-        widths = {'category':3, 'description':9}
+        advanced = ['no_of_outputs', 'sample_schema', 'status', 'special', 'created_for']
         super().__init__(*args, **kwargs)
         for field in iter(self.fields):
+            curr_class = 'form-control'
+            if field in advanced:
+                curr_class += ' advanced_mode'
             self.fields[field].widget.attrs.update({
-                'class': 'form-control',
+                'class': curr_class,
                 'id':field,
                 'rows':'1',
                 'autocomplete':'none'

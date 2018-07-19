@@ -3,16 +3,24 @@
 <div class="modal fade" id="createProcessModal" tabindex="-1" role="dialog" aria-labelledby="createProcessModal" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Create Process</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-12">
-            <form method="post" action="/add/step" onsubmit="checkAndPopulateFields()" id='step_form'>
+      <form method="post" action="/add/step" onsubmit="checkAndPopulateFields()" id='step_form'>
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Create Process</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12">
+              <label class="switch float-right" id="step_advanced_mode">
+                <input type="checkbox">
+                <span class="slider round"><div class="text-center text-white" style="padding-top:.25em">Advanced</div> </span>
+              </label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
               {% csrf_token %}
               {{ step_form.management_form }}
               <div class="input-group">
@@ -20,7 +28,7 @@
                   <span id="bash_script" class="input-group-text">Bash script:</span>
                 </div>
                 <div style="outline:0 !important" class="text-left form-control" onkeyup="checkScript('analysisStepScript')" name="script" id="script" required>
-                  <span id="analysisStepScript" class="edit" style="outline:0 !important;" contenteditable>&nbsp;></span>
+                  <span id="analysisStepScript" class="edit p-1" style="outline:0 !important;" contenteditable>&nbsp;></span>
                 </div>
                 <input type="hidden" name="script" >
               </div>
@@ -41,21 +49,14 @@
   										{{form_element}}
   							{% endfor %}
               </div>
-
-              <div class="row">
-                <div class="col-md-12 form-group">
-                    <button type="submit" class="btn btn-sm btn-block btn-primary">Create Data Category</button>
-                </div>
-              </div>
-            </form>
+            </div>
           </div>
         </div>
-
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Create Data Category</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -104,7 +105,7 @@
 
 
 <script type="text/javascript">
-
+  var step_advanced_mode_toggle = false
   //i:input, s:select
   var step_dict = {
       'major':['fastq.gz', 'fastq', 'fa', 'sam', 'csv'],
@@ -303,6 +304,22 @@
     return e.childNodes[0].nodeValue;
   }
 
-  //checkCommand()
+
+  $( "#step_advanced_mode" ).click(function() {
+    step_advanced_mode_toggle = !step_advanced_mode_toggle
+    if (step_advanced_mode_toggle) {
+      $('.advanced_mode').parent().collapse('show')
+    }else {
+      $('.advanced_mode').parent().collapse('hide')
+    }
+  });
+
+  $('.advanced_mode').parent().addClass('collapse')
+
+
+
+
+
+
 </script>
 <script src="{% static 'js/build.js' %}"></script>

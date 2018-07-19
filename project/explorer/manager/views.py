@@ -21,7 +21,7 @@ import html
 
 def homepage(request):
     render_dict = getConfigDict(request)
-    render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular'})
+    render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
     return render(request, 'homepage.html', render_dict)
 
 
@@ -29,7 +29,7 @@ def homepage(request):
 def addStep(request):
     render_dict = getConfigDict(request)
     form = StepForm
-    render_dict['step_form']=form(initial={'access_list': 'public', 'status':'tested', 'special':'regular'})
+    render_dict['step_form']=form(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
     if request.method == 'POST':
         formInput = form(request.POST)
         print(request.user.username)

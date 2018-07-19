@@ -34,8 +34,11 @@ class Step(models.Model):
     ACCESS = ((access, access) for access in ('public', 'private'))
     STATUS = ((status, status) for status in ('tested', 'experimental'))
     SPECIAL = ((special, special) for special in ('regular', 'upload', 'public', 'other'))
+    NO_OF = ((no_of, no_of) for no_of in ('one', 'many'))
 
     short_name = models.CharField(max_length=64, unique=True)
+    no_of_outputs = models.CharField(max_length=64, choices=NO_OF)
+    sample_schema = models.CharField(max_length=256, blank=True, null=True)
     created_for = models.CharField(max_length=256, choices=USERS, blank=True, null=True)
     access_list = models.CharField(max_length=2048, choices=ACCESS)
     description = models.CharField(max_length=2048)
