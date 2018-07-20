@@ -315,6 +315,7 @@
     for (var i = 1; i < 6; i++) {
       relationship_select.options[i].disabled=false
     }
+    var all_enabled = [1, 2, 3, 4, 5]
 
     //first, check number of inputs based on the script
     if (script.includes('&lt;fm_')) { //means step expects many inputs
@@ -325,22 +326,22 @@
       }else {
         var enabled = [3, 4, 5]
         for (var i = 1; i < 6; i++) {
-          if (!(i in enabled)) {
+          if (enabled.indexOf(i) < 0) {
             relationship_select.options[i].disabled=true
           }
         }
-        if (!(relationship_select.selectedIndex in enabled)) {
+        if (enabled.indexOf(relationship_select.selectedIndex) < 0) {
           relationship_select.selectedIndex = 3
         }
       }
     }else if (script.includes('&lt;fs_')) {
       var enabled = [1, 2]
       for (var i = 1; i < 6; i++) {
-        if (!(i in enabled)) {
+        if (enabled.indexOf(i) < 0) {
           relationship_select.options[i].disabled=true
         }
       }
-      if (!(relationship_select.selectedIndex in enabled)) {
+      if (enabled.indexOf(relationship_select.selectedIndex) < 0) {
         relationship_select.selectedIndex = 1
       }
     }else {
@@ -350,61 +351,67 @@
       }
       relationship_select.selectedIndex=0
     }
+    console.log('1>', relationship_select.selectedIndex);
 
     //second, check number of outputs based on the no_of_outputs dropdown
     var no_of_outputs_select = document.getElementById('no_of_outputs')
     console.log('no_of_outputs_select', no_of_outputs_select.selectedIndex )
     if (no_of_outputs_select.selectedIndex == 1) {
+      console.log(1,3);
       var enabled = [1, 3]
       for (var i = 1; i < 6; i++) {
-        if (!(i in enabled)) {
+        if (enabled.indexOf(i) < 0) {
           relationship_select.options[i].disabled=true
         }
       }
-      if (!(relationship_select.selectedIndex in enabled)) {
+      if (enabled.indexOf(relationship_select.selectedIndex) < 0) {
         relationship_select.selectedIndex = 0
       }
     }else if (no_of_outputs_select.selectedIndex == 2) {
+      console.log(2,4,5);
       var enabled = [2, 4, 5]
       for (var i = 1; i < 6; i++) {
-        if (!(i in enabled)) {
+        if (enabled.indexOf(i) < 0) {
           relationship_select.options[i].disabled=true
         }
       }
-      if (!(relationship_select.selectedIndex in enabled)) {
+      if (enabled.indexOf(relationship_select.selectedIndex) < 0) {
         relationship_select.selectedIndex = 0
       }
     }else {
+      console.log('all disabled');
       for (var i = 1; i < 6; i++) {
         relationship_select.options[i].disabled=true
       }
       relationship_select.selectedIndex=0
     }
+    console.log('2>', relationship_select.selectedIndex);
 
     //third, check script again to see if there is >f_output, which means it's either 1:1, *>1, or *:*
     if (script.includes('&gt;f_output')) { //means step provides single input at the end
       console.log('>f_output');
       var enabled = [1, 3, 5]
       for (var i = 1; i < 6; i++) {
-        if (!(i in enabled)) {
+        if (enabled.indexOf(i) < 0) {
           relationship_select.options[i].disabled=true
         }
       }
-      if (!(relationship_select.selectedIndex in enabled)) {
+      if (enabled.indexOf(relationship_select.selectedIndex) < 0) {
         relationship_select.selectedIndex = 0
       }
     }else {
       console.log('nothing again');
       var enabled = [2, 4]
       for (var i = 1; i < 6; i++) {
-        if (!(i in enabled)) {
+        if (enabled.indexOf(i) < 0) {
           relationship_select.options[i].disabled=true
         }
       }
-      if (!(relationship_select.selectedIndex in enabled)) {
+      if (enabled.indexOf(relationship_select.selectedIndex) < 0) {
         relationship_select.selectedIndex = 0
       }
     }
+    console.log('3>', relationship_select.selectedIndex);
 
   }
 
