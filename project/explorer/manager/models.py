@@ -31,13 +31,17 @@ class MajorDataCategory(models.Model):
 
 class Step(models.Model):
     USERS = ((user,user) for user in CustomUser.objects.values_list('username', flat=True) if user != 'admin')
+    DATA_CATEGORIES = ((category,category) for category in MajorDataCategory.objects.values_list('category', flat=True))
     ACCESS = ((access, access) for access in ('public', 'private'))
     STATUS = ((status, status) for status in ('tested', 'experimental'))
     SPECIAL = ((special, special) for special in ('regular', 'upload', 'public', 'other'))
-    NO_OF = ((no_of, no_of) for no_of in ('one', 'many'))
+    NO_OF = ((no_of, description) for description, no_of in (('one output per one input file', 'one'), ('many outputs of the same kind', 'many')))
+    RELATIONSHIP = ((relation, description) for description, relation in (('1 input file for 1 output', '1:1'), ('1 input file processed for many outputs', '1:*'), ('many input files for 1 output', '*>1'), ('many input files processed together for many outputs', '*>*'), ('Each input file corresponds to an individual output', '*:*')))
 
     short_name = models.CharField(max_length=64, unique=True)
     no_of_outputs = models.CharField(max_length=64, choices=NO_OF)
+    output_major_data_category = models.CharField(max_length=128, choices=DATA_CATEGORIES)
+    input_output_relationship = models.CharField(max_length=128, choices=RELATIONSHIP)
     sample_schema = models.CharField(max_length=256, blank=True, null=True)
     created_for = models.CharField(max_length=256, choices=USERS, blank=True, null=True)
     access_list = models.CharField(max_length=2048, choices=ACCESS)
@@ -50,7 +54,6 @@ class Step(models.Model):
     subfolder_path = models.CharField(max_length=256)
     dependencies = models.TextField()
     input_major_data_category = models.CharField(max_length=128)
-    output_major_data_category = models.CharField(max_length=128)
     minor_data = models.CharField(max_length=256)
     one_or_many_input_files = models.CharField(max_length=32)
     score = models.CharField(max_length=256)

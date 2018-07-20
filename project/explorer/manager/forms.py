@@ -27,8 +27,7 @@ class StepForm(ModelForm):
     raw_script = forms.CharField(widget=forms.HiddenInput(), required=False)
     class Meta:
         model = Step
-        fields = ['raw_script', 'short_name', 'description', 'no_of_outputs', 'sample_schema', 'access_list', 'status', 'special', 'created_for']
-
+        fields = ['raw_script', 'short_name', 'description', 'output_major_data_category', 'input_output_relationship', 'access_list', 'no_of_outputs', 'sample_schema', 'status', 'special', 'created_for']
 
 
     def __init__(self, *args, **kwargs):
@@ -43,7 +42,7 @@ class StepForm(ModelForm):
                 'id':field,
                 'rows':'1',
                 'autocomplete':'none'
-        })
+            })
 
 
 class MajorDataCategoryForm(ModelForm):

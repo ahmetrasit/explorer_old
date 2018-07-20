@@ -10,13 +10,16 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" onchange="bodyChange()">
           <div class="row">
             <div class="col-md-12">
               <label class="switch float-right" id="step_advanced_mode">
                 <input type="checkbox">
                 <span class="slider round"><div class="text-center text-white" style="padding-top:.25em">Advanced</div> </span>
               </label>
+            </div>
+            <div class="col-md-12">
+              <small>Use <b>>f_output</b> to represent a single output file</small>
             </div>
           </div>
           <div class="row">
@@ -28,7 +31,7 @@
                   <span id="bash_script" class="input-group-text">Bash script:</span>
                 </div>
                 <div style="outline:0 !important" class="text-left form-control" onkeyup="checkScript('analysisStepScript')" name="script" id="script" required>
-                  <span id="analysisStepScript" class="edit p-1" style="outline:0 !important;" contenteditable>&nbsp;></span>
+                  <span id="analysisStepScript" class="edit p-1" style="outline:0 !important;" contenteditable>&nbsp;</span>
                 </div>
                 <input type="hidden" name="script" >
               </div>
@@ -106,6 +109,7 @@
 
 <script type="text/javascript">
   var step_advanced_mode_toggle = false
+  var valid_step = false
   //i:input, s:select
   var step_dict = {
       'major':['fastq.gz', 'fastq', 'fa', 'sam', 'csv'],
@@ -241,7 +245,7 @@
       humanize()
     }
     document.getElementById('raw_script').value = document.getElementById('analysisStepScript').innerHTML
-
+    updateInputOutputRelationship()
   }
 
   function humanize(){
@@ -305,6 +309,106 @@
   }
 
 
+  function updateInputOutputRelationship() {
+    var script = document.getElementById('analysisStepScript').innerHTML
+    var relationship_select = document.getElementById('input_output_relationship')
+    for (var i = 1; i < 6; i++) {
+      relationship_select.options[i].disabled=false
+    }
+
+    //first, check number of inputs based on the script
+    if (script.includes('&lt;fm_')) { //means step expects many inputs
+      console.log('<fm_');
+      if (script.includes('&lt;fs_')) {
+        alert('Sorry, you cannot have <fm_* and <fs_* at the same time.')
+        valid_step = False
+      }else {
+        var enabled = [3, 4, 5]
+        for (var i = 1; i < 6; i++) {
+          if (!(i in enabled)) {
+            relationship_select.options[i].disabled=true
+          }
+        }
+        if (!(relationship_select.selectedIndex in enabled)) {
+          relationship_select.selectedIndex = 3
+        }
+      }
+    }else if (script.includes('&lt;fs_')) {
+      var enabled = [1, 2]
+      for (var i = 1; i < 6; i++) {
+        if (!(i in enabled)) {
+          relationship_select.options[i].disabled=true
+        }
+      }
+      if (!(relationship_select.selectedIndex in enabled)) {
+        relationship_select.selectedIndex = 1
+      }
+    }else {
+      console.log('nothing');
+      for (var i = 1; i < 6; i++) {
+        relationship_select.options[i].disabled=true
+      }
+      relationship_select.selectedIndex=0
+    }
+
+    //second, check number of outputs based on the no_of_outputs dropdown
+    var no_of_outputs_select = document.getElementById('no_of_outputs')
+    console.log('no_of_outputs_select', no_of_outputs_select.selectedIndex )
+    if (no_of_outputs_select.selectedIndex == 1) {
+      var enabled = [1, 3]
+      for (var i = 1; i < 6; i++) {
+        if (!(i in enabled)) {
+          relationship_select.options[i].disabled=true
+        }
+      }
+      if (!(relationship_select.selectedIndex in enabled)) {
+        relationship_select.selectedIndex = 0
+      }
+    }else if (no_of_outputs_select.selectedIndex == 2) {
+      var enabled = [2, 4, 5]
+      for (var i = 1; i < 6; i++) {
+        if (!(i in enabled)) {
+          relationship_select.options[i].disabled=true
+        }
+      }
+      if (!(relationship_select.selectedIndex in enabled)) {
+        relationship_select.selectedIndex = 0
+      }
+    }else {
+      for (var i = 1; i < 6; i++) {
+        relationship_select.options[i].disabled=true
+      }
+      relationship_select.selectedIndex=0
+    }
+
+    //third, check script again to see if there is >f_output, which means it's either 1:1, *>1, or *:*
+    if (script.includes('&gt;f_output')) { //means step provides single input at the end
+      console.log('>f_output');
+      var enabled = [1, 3, 5]
+      for (var i = 1; i < 6; i++) {
+        if (!(i in enabled)) {
+          relationship_select.options[i].disabled=true
+        }
+      }
+      if (!(relationship_select.selectedIndex in enabled)) {
+        relationship_select.selectedIndex = 0
+      }
+    }else {
+      console.log('nothing again');
+      var enabled = [2, 4]
+      for (var i = 1; i < 6; i++) {
+        if (!(i in enabled)) {
+          relationship_select.options[i].disabled=true
+        }
+      }
+      if (!(relationship_select.selectedIndex in enabled)) {
+        relationship_select.selectedIndex = 0
+      }
+    }
+
+  }
+
+
   $( "#step_advanced_mode" ).click(function() {
     step_advanced_mode_toggle = !step_advanced_mode_toggle
     if (step_advanced_mode_toggle) {
@@ -319,7 +423,9 @@
 
 
 
-
+  function bodyChange() {
+    updateInputOutputRelationship()
+  }
 
 </script>
 <script src="{% static 'js/build.js' %}"></script>
