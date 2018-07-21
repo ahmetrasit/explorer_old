@@ -319,7 +319,6 @@
 
     //first, check number of inputs based on the script
     if (script.includes('&lt;fm_')) { //means step expects many inputs
-      console.log('<fm_');
       if (script.includes('&lt;fs_')) {
         alert('Sorry, you cannot have <fm_* and <fs_* at the same time.')
         valid_step = False
@@ -345,19 +344,15 @@
         relationship_select.selectedIndex = 1
       }
     }else {
-      console.log('nothing');
       for (var i = 1; i < 6; i++) {
         relationship_select.options[i].disabled=true
       }
       relationship_select.selectedIndex=0
     }
-    console.log('1>', relationship_select.selectedIndex);
 
     //second, check number of outputs based on the no_of_outputs dropdown
     var no_of_outputs_select = document.getElementById('no_of_outputs')
-    console.log('no_of_outputs_select', no_of_outputs_select.selectedIndex )
     if (no_of_outputs_select.selectedIndex == 1) {
-      console.log(1,3);
       var enabled = [1, 3]
       for (var i = 1; i < 6; i++) {
         if (enabled.indexOf(i) < 0) {
@@ -368,7 +363,6 @@
         relationship_select.selectedIndex = 0
       }
     }else if (no_of_outputs_select.selectedIndex == 2) {
-      console.log(2,4,5);
       var enabled = [2, 4, 5]
       for (var i = 1; i < 6; i++) {
         if (enabled.indexOf(i) < 0) {
@@ -379,17 +373,14 @@
         relationship_select.selectedIndex = 0
       }
     }else {
-      console.log('all disabled');
       for (var i = 1; i < 6; i++) {
         relationship_select.options[i].disabled=true
       }
       relationship_select.selectedIndex=0
     }
-    console.log('2>', relationship_select.selectedIndex);
 
     //third, check script again to see if there is >f_output, which means it's either 1:1, *>1, or *:*
     if (script.includes('&gt;f_output')) { //means step provides single input at the end
-      console.log('>f_output');
       var enabled = [1, 3, 5]
       for (var i = 1; i < 6; i++) {
         if (enabled.indexOf(i) < 0) {
@@ -400,7 +391,6 @@
         relationship_select.selectedIndex = 0
       }
     }else {
-      console.log('nothing again');
       var enabled = [2, 4]
       for (var i = 1; i < 6; i++) {
         if (enabled.indexOf(i) < 0) {
@@ -411,7 +401,11 @@
         relationship_select.selectedIndex = 0
       }
     }
-    console.log('3>', relationship_select.selectedIndex);
+    if (relationship_select.selectedIndex == 0) {
+      document.getElementById('input_output_relationship').parentNode.style.background = 'lightgray'
+    }else {
+      document.getElementById('input_output_relationship').parentNode.style.background = 'white'
+    }
 
   }
 
