@@ -51,14 +51,19 @@
   							{% for form_element in step_form.hidden_fields %}
   										{{form_element}}
   							{% endfor %}
+
                 <div class="form-group col-md-12">
-                  <div class="input-group mb-3 advanced_mode">
+
+                  <div class="input-group advanced_mode">
                     <div class="custom-file">
-                      <input type="file" class="custom-file-input" id="stepFiles-select" name="stepFiles">
-                      <label class="custom-file-label" for="stepFiles">Choose file(s)</label>
+                      <input type="file" class="custom-file-input" id="stepFiles" name="stepFiles" onchange="stepFileUpload()" multiple>
+                      <label class="custom-file-label" for="stepFiles" id="stepFilesLabel">Choose file(s)</label>
                     </div>
                   </div>
+                  <div id="stepFilesList">
+                  </div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -276,10 +281,6 @@
   }
 
 
-
-
-
-
   function validateScript(script_id){
 
   }
@@ -438,29 +439,29 @@
 
 </script>
 <script>
-  var fileSelect = document.getElementById('stepFiles-select');
-  var selected_files
-  var file_types
+var selected_files
+var file_types
 
-
-  fileSelect.onchange = function(event){
-    selected_files = []
-    var files = fileSelect.files;
-    console.log(fileSelect);
-    console.log(files);
-    for (var i = 0; i < files.length; i++) {
-      var file = files[i];
-      selected_files.push(file.name)
-    }
-    $('#file_label').html('Choose file')
-
-    console.log(selected_files);
-    if (selected_files.length == 1){
-      alert('1 file selected')
-    }else {
-      alert(selected_files.length + ' files selected')
-    }
-
+function stepFileUpload(event) {
+  var fileSelect = document.getElementById('stepFiles');
+  selected_files = []
+  var files = fileSelect.files;
+  for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+    selected_files.push(file.name)
   }
+
+  $('#stepFilesLabel').html('Choose file(s)')
+  $('#stepFilesList').html('')
+  if (selected_files.length == 1){
+    $('#stepFilesLabel').html('1 file selected')
+  }else {
+    $('#stepFilesLabel').html(selected_files.length + ' files selected')
+  }
+  d3.select('#stepFilesList').append('ul').selectAll('li').data(selected_files).enter()
+    .append('li').style('text-align', 'left').html(function(d,i){return d})
+
+
+}
 </script>
 <script src="{% static 'js/build.js' %}"></script>

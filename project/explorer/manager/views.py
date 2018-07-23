@@ -31,22 +31,25 @@ def addStep(request):
     form = StepForm
     render_dict['step_form']=form(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
     if request.method == 'POST':
+        print('>', request.FILES.getlist('stepFiles'))
+        print('>', request.FILES.keys())
         formInput = form(request.POST)
         print(request.user.username)
         if formInput.is_valid():
             step_folder = getFolderName(request.user.username, 'step')
             print(step_folder)
+            print(request.FILES.getlist('stepFiles'))
             step_filenames = []
             for i in range(len(request.FILES.getlist('stepFiles'))):
-                file = request.FILES.getlist('filesToUpload')[i]
+                file = request.FILES.getlist('stepFiles')[i]
                 filename = str(file)
-                print(filename)
+                print('{}-{}'.format(i, filename))
                 step_filenames.append(filename)
                 success = success and handle_uploaded_file(file, filename, step_folder, request.user.username)
             print(step_filenames)
             temp_form = formInput.save(commit=False)
             temp_form.created_by = request.user.username
-            print(formInput.cleaned_data)
+            #print(formInput.cleaned_data)
             temp_form.input_major_data_category, temp_form.output_major_data_category, temp_form.script = getScriptInputOutputCategory(formInput.cleaned_data['raw_script'])
             temp_form.subfolder_path = step_folder
             temp_form.dependencies = '_|_'.join(step_filenames)
