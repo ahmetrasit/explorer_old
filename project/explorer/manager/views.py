@@ -31,25 +31,17 @@ def addStep(request):
     form = StepForm
     render_dict['step_form']=form(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
     if request.method == 'POST':
-        print('>', request.FILES.getlist('stepFiles'))
-        print('>', request.FILES.keys())
         formInput = form(request.POST)
-        print(request.user.username)
         if formInput.is_valid():
             step_folder = getFolderName(request.user.username, 'step')
-            print(step_folder)
-            print(request.FILES.getlist('stepFiles'))
             step_filenames = []
             for i in range(len(request.FILES.getlist('stepFiles'))):
                 file = request.FILES.getlist('stepFiles')[i]
                 filename = str(file)
-                print('{}-{}'.format(i, filename))
                 step_filenames.append(filename)
-                success = success and handle_uploaded_file(file, filename, step_folder, request.user.username)
-            print(step_filenames)
+                success = handle_uploaded_file(file, filename, step_folder, request.user.username)
             temp_form = formInput.save(commit=False)
             temp_form.created_by = request.user.username
-            #print(formInput.cleaned_data)
             temp_form.input_major_data_category, temp_form.output_major_data_category, temp_form.script = getScriptInputOutputCategory(formInput.cleaned_data['raw_script'])
             temp_form.subfolder_path = step_folder
             temp_form.dependencies = '_|_'.join(step_filenames)
@@ -84,7 +76,6 @@ def getScriptInputOutputCategory(raw_script):
     script = html.unescape(raw_script)
     script = re.sub(r'<\/?span[^>]*>', '', script)
     script = re.sub(r'<\/?p[^_>]*>', '', script)
-    print(script)
     inputs = re.findall(r'(<[fsid][smyp]_[\w.-]+)\W', script)
     input_major_data_category = '_|_'.join([re.sub(r'^<\w\w_', '', curr) for curr in inputs if re.match('<f', curr)])
     outputs = re.findall(r'(>[f]_[\w.-]+)\W', script)
@@ -144,7 +135,6 @@ def addDataCategory(request):
 
 
 def createSystemUser(username):
-    print(username)
     return False
 
 
@@ -199,7 +189,6 @@ def getInputs(script):
 			io_type = io_types[match.group(1)]
 			data_type = match.group(2)
 			data_name = match.group(3)
-			print('inputs', io_type, data_type, data_name)
 			inputs.append(':'.join([io_type, data_type, data_name]))
 	return ';'.join(inputs)
 
@@ -213,7 +202,6 @@ def getOutputs(script):
 			io_type = io_types[match.group(1)]
 			data_type = match.group(2)
 			data_name = match.group(3)
-			print('outputs', io_type, data_type, data_name)
 			outputs.append(':'.join([io_type, data_type, data_name]))
 	return ';'.join(outputs)
 
@@ -224,7 +212,6 @@ def getParameters(script):
 		match = re.match("-p_([a-z-]+)", item)
 		if match:
 			parameter_type = match.group(1)
-			print('parameter',parameter_type)
 			parameters.append(parameter_type)
 	return ';'.join(parameters)
 
@@ -243,19 +230,15 @@ def uploadFASTQ(request):
 
 @csrf_exempt
 def handle_uploaded_file(f, filename, foldername, username):
-    print(os.getcwd(), os.listdir('./'))
     try:
         os.mkdir(foldername)
-        print(folderName, ' created')
     except Exception as e:
-        print(e)
-
+        print('Error:{} for {}'.format(foldername, e))
     try:
-        with open(foldername + filename, 'wb+') as destination:
+        with open(foldername + '/' +  filename, 'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
-        print(filename, ' created')
         return True
     except Exception as e:
-        print(e)
-        return false
+        print('Error:{} for {}'.format(filename, e))
+        return False

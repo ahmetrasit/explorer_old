@@ -126,3 +126,8 @@
     border: 0;
     box-shadow: none;
 }
+
+
+.modal {
+  overflow-y:auto !important;
+}

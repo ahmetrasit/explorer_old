@@ -3,7 +3,7 @@
 <div class="modal fade" id="createProcessModal" tabindex="-1" role="dialog" aria-labelledby="createProcessModal" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <form method="post" action="/add/step" onsubmit="checkAndPopulateFields()" id='step_form'>
+      <form method="post" enctype="multipart/form-data" action="/add/step" onsubmit="checkAndPopulateFields()" id='step_form'>
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Create Process</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -221,6 +221,7 @@
         }
         document.getElementById('analysisStepScript').innerHTML = document.getElementById('analysisStepScript').innerHTML.replace("@&lt;", cmd)
         $('#addPlaceholder').modal('hide')
+        $('#createProcessModal').modal('show')
       }else if (cmd_fields[2]=='name') {
         var input_value = document.getElementById('io_inputfieldinput').value.trim().replace(/\W+/g, '-')
         if (input_value.length < 3) {
@@ -229,6 +230,7 @@
           cmd += '_' + input_value
           document.getElementById('analysisStepScript').innerHTML = document.getElementById('analysisStepScript').innerHTML.replace("@&lt;", cmd)
           $('#addPlaceholder').modal('hide')
+          $('#createProcessModal').modal('show')
         }
       }else {
         alert('Something wrong, please contact admin');
@@ -242,6 +244,7 @@
         cmd += '_' + input_value
         document.getElementById('analysisStepScript').innerHTML = document.getElementById('analysisStepScript').innerHTML.replace("@&lt;", cmd)
         $('#addPlaceholder').modal('hide')
+        $('#createProcessModal').modal('show')
       }
     }else {
       alert('Something wrong, please contact admin');
@@ -269,6 +272,7 @@
     new_options.text(function(d){return input_descriptions[d]})
     new_options.attr('value', function(d){return d})
     updateInputType()
+    $('#createProcessModal').modal('hide')
     $('#addPlaceholder').modal('show')
   }
 
