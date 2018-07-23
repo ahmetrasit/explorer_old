@@ -13,43 +13,7 @@
 
 			<div class="row">
 				<div class="col-md-12">
-					<form method="post" action="/add/step" onsubmit="checkAndPopulateFields()">
-						{% csrf_token %}
-						{{ step_form.management_form }}
-						<div class="input-group">
-							<div class="input-group-prepend">
-								<span id="bash_script" class="input-group-text">Bash script:</span>
-							</div>
-							<div style="outline:0 !important" class="text-left form-control" onkeyup="checkScript('analysisStepScript')" name="script" id="script" required>
-								<span id="analysisStepScript" class="edit" style="outline:0 !important;" contenteditable>&nbsp;</span>
-							</div>
-							<input type="hidden" name="script" id="script" value='hidden script' >
-							asdfasdf
-						</div>
-						<div class="row">
-							{% for form_element in step_form.visible_fields %}
-									<div class="form-group col-md-6">
-										<label style="font-size:.8em" for="{{form_element.name}}">{{form_element.label}}</label>
-										{{form_element}}
-
-										{% for error in form_element.errors %}
-												<div class="alert alert-danger">
-														<strong>{{ error|escape }}</strong>
-												</div>
-										{% endfor %}
-									</div>
-							{% endfor %}
-							{% for form_element in step_form.hidden_fields %}
-										{{form_element}}
-							{% endfor %}
-						</div>
-
-						<div class="row">
-							<div class="col-md-12 form-group">
-									<button type="submit" class="btn btn-sm btn-block btn-primary">Create Data Category</button>
-							</div>
-						</div>
-					</form>
+					{% include "templates/_create_process_modal.html" %}
 
 				</div>
 

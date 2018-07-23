@@ -34,12 +34,23 @@ def addStep(request):
         formInput = form(request.POST)
         print(request.user.username)
         if formInput.is_valid():
+            step_folder = getFolderName(request.user.username, 'step')
+            print(step_folder)
+            step_filenames = []
+            for i in range(len(request.FILES.getlist('stepFiles'))):
+                file = request.FILES.getlist('filesToUpload')[i]
+                filename = str(file)
+                print(filename)
+                step_filenames.append(filename)
+                success = success and handle_uploaded_file(file, filename, step_folder, request.user.username)
+            print(step_filenames)
             temp_form = formInput.save(commit=False)
             temp_form.created_by = request.user.username
             print(formInput.cleaned_data)
             temp_form.input_major_data_category, temp_form.output_major_data_category, temp_form.script = getScriptInputOutputCategory(formInput.cleaned_data['raw_script'])
+            temp_form.subfolder_path = step_folder
+            temp_form.dependencies = '_|_'.join(step_filenames)
             temp_form.save()
-
             message = 'Step successfully added'
         else:
             message = 'Cannot create step.'
@@ -50,6 +61,18 @@ def addStep(request):
     render_dict['steps'] = Step.objects.all().values(*step_fields)[::-1]
     render_dict['step_fields'] = step_fields
     return render(request, 'addStep.html', render_dict)
+
+
+def getFolderName(username, type):
+    #temp:temporary, perm:permanent
+    types = {'upload':'temp', 'task':'temp', 'step':'perm', 'data_point':'perm'}
+    folderName = '!'
+    if type in types:
+        curr_time = int(time.time())
+        rand_num = random.randint(111111,999999)
+        folderName = 'static/{}/{}_{}_{}'.format(types[type], username, curr_time, rand_num)
+
+    return folderName
 
 
 
@@ -163,31 +186,6 @@ def getConfigDict(request):
     return render_dict
 
 
-@csrf_exempt
-def createProcess(request):
-    print('db', Workflow.objects.all())
-    if request.POST['bashProcessID'].strip() not in Workflow.objects.values_list('process_id', flat=True):
-        try:
-            bash_process = Workflow(
-				process_id = request.POST['bashProcessID'].strip(),
-    			name = request.POST['bashProcessName'].strip(),
-                category = 'bash',
-                status = 'approved',
-                inputs = getInputs(request.POST['bashProcessScript'].strip().lower()),
-                outputs = getOutputs(request.POST['bashProcessScript'].strip().lower()),
-                parameters = getParameters(request.POST['bashProcessScript'].strip().lower()),
-                description = request.POST['bashProcessDescription'].strip(),
-                content = request.POST['bashProcessScript'].strip(),
-                created_by = request.user.username
-    		)
-            bash_process.save()
-            return HttpResponse('<div class="btn btn-success btn-block">Bash Process Successfully Created</div>')
-        except Exception as e:
-            return HttpResponse('<div class="btn btn-danger btn-block">There is a problem on server side!'+str(e)+'</div>')
-    else:
-        return HttpResponse('<div class="btn btn-danger btn-block">There is already a process with the same id!</div>')
-
-
 
 def getInputs(script):
 	inputs = []
@@ -241,10 +239,20 @@ def uploadFASTQ(request):
 
 
 @csrf_exempt
-def handle_uploaded_file(f, filename, random_folder, username):
+def handle_uploaded_file(f, filename, foldername, username):
     print(os.getcwd(), os.listdir('./'))
-    os.mkdir('static/temporary/' + random_folder)
-    with open('static/temporary/' + random_folder + filename, 'wb+') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-    return True
+    try:
+        os.mkdir(foldername)
+        print(folderName, ' created')
+    except Exception as e:
+        print(e)
+
+    try:
+        with open(foldername + filename, 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
+        print(filename, ' created')
+        return True
+    except Exception as e:
+        print(e)
+        return false

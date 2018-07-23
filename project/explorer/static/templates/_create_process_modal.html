@@ -51,6 +51,14 @@
   							{% for form_element in step_form.hidden_fields %}
   										{{form_element}}
   							{% endfor %}
+                <div class="form-group col-md-12">
+                  <div class="input-group mb-3 advanced_mode">
+                    <div class="custom-file">
+                      <input type="file" class="custom-file-input" id="stepFiles-select" name="stepFiles">
+                      <label class="custom-file-label" for="stepFiles">Choose file(s)</label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -428,5 +436,31 @@
     updateInputOutputRelationship()
   }
 
+</script>
+<script>
+  var fileSelect = document.getElementById('stepFiles-select');
+  var selected_files
+  var file_types
+
+
+  fileSelect.onchange = function(event){
+    selected_files = []
+    var files = fileSelect.files;
+    console.log(fileSelect);
+    console.log(files);
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+      selected_files.push(file.name)
+    }
+    $('#file_label').html('Choose file')
+
+    console.log(selected_files);
+    if (selected_files.length == 1){
+      alert('1 file selected')
+    }else {
+      alert(selected_files.length + ' files selected')
+    }
+
+  }
 </script>
 <script src="{% static 'js/build.js' %}"></script>
