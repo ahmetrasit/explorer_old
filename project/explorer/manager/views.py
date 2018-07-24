@@ -22,6 +22,8 @@ import html
 def homepage(request):
     render_dict = getConfigDict(request)
     render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
+    render_dict['reference_form'] = ReferenceForm()
+    print(MajorDataCategory.objects.values_list('category', flat=True))
     return render(request, 'homepage.html', render_dict)
 
 
@@ -42,7 +44,7 @@ def addStep(request):
                 success = handle_uploaded_file(file, filename, step_folder, request.user.username)
             temp_form = formInput.save(commit=False)
             temp_form.created_by = request.user.username
-            temp_form.input_major_data_category, temp_form.output_major_data_category, temp_form.script = getScriptInputOutputCategory(formInput.cleaned_data['raw_script'])
+            temp_form.input_major_data_category, temp_form.script = getScriptInputOutputCategory(formInput.cleaned_data['raw_script'])
             temp_form.subfolder_path = step_folder
             temp_form.dependencies = '_|_'.join(step_filenames)
             temp_form.save()
@@ -53,8 +55,8 @@ def addStep(request):
         render_dict['step_form']=formInput
 
     step_fields = ['short_name', 'created_for', 'access_list', 'description', 'status', 'special', 'created_by']
-    render_dict['steps'] = Step.objects.all().values(*step_fields)[::-1]
-    render_dict['step_fields'] = step_fields
+    render_dict['steps'] = Step.objects.all().values()[::-1]
+    render_dict['step_fields'] = [str(curr).split('.')[-1] for curr in Step._meta.get_fields()]
     return render(request, 'addStep.html', render_dict)
 
 
@@ -79,9 +81,9 @@ def getScriptInputOutputCategory(raw_script):
     inputs = re.findall(r'(<[fsid][smyp]_[\w.-]+)\W', script)
     input_major_data_category = '_|_'.join([re.sub(r'^<\w\w_', '', curr) for curr in inputs if re.match('<f', curr)])
     outputs = re.findall(r'(>[f]_[\w.-]+)\W', script)
-    output_major_data_category = '_|_'.join([re.sub(r'^>f_', '', curr) for curr in outputs if re.match('>f', curr)])
+    #output_major_data_category = '_|_'.join([re.sub(r'^>f_', '', curr) for curr in outputs if re.match('>f', curr)])
 
-    return input_major_data_category, output_major_data_category, script
+    return input_major_data_category, script
 
 
 
@@ -113,19 +115,20 @@ def addUser(request):
 @login_required
 def addDataCategory(request):
     render_dict = getConfigDict(request)
-    form = MajorDataCategoryForm
+    if request.user.username == 'admin':
+        form = MajorDataCategoryForm
 
-    render_dict['form']=form()
-    if request.method == 'POST':
-        formInput = form(request.POST)
-        if formInput.is_valid():
-            formInput.save()
-            message = 'Data category successfully added'
-        else:
-            message = 'Cannot add data category'
+        render_dict['form']=form()
+        if request.method == 'POST':
+            formInput = form(request.POST)
+            if formInput.is_valid():
+                formInput.save()
+                message = 'Data category successfully added'
+            else:
+                message = 'Cannot add data category'
 
-        render_dict['message'] = message
-        render_dict['form']=formInput
+            render_dict['message'] = message
+            render_dict['form']=formInput
 
     data_category_fields = ['category', 'description']
     render_dict['data_categories'] = MajorDataCategory.objects.all().values(*data_category_fields)[::-1]
@@ -135,7 +138,7 @@ def addDataCategory(request):
 
 
 def createSystemUser(username):
-    return False
+    return True
 
 
 @login_required

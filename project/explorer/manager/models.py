@@ -34,7 +34,7 @@ class Step(models.Model):
     DATA_CATEGORIES = ((category,category) for category in MajorDataCategory.objects.values_list('category', flat=True))
     ACCESS = ((access, access) for access in ('public', 'private'))
     STATUS = ((status, status) for status in ('tested', 'experimental'))
-    SPECIAL = ((special, special) for special in ('regular', 'upload', 'public', 'other'))
+    SPECIAL = ((special, special) for special in ('regular', 'upload', 'other'))
     NO_OF = ((no_of, description) for description, no_of in (('one output per one input file', 'one'), ('many outputs of the same kind', 'many')))
     RELATIONSHIP = ((relation, description) for description, relation in (('1 input file for 1 output', '1:1'), ('1 input file processed for many outputs', '1:*'), ('many input files for 1 output', '*>1'), ('many input files processed together for many outputs', '*>*'), ('Each input file corresponds to an individual output', '*:*')))
 
@@ -55,7 +55,23 @@ class Step(models.Model):
     dependencies = models.TextField()
     input_major_data_category = models.CharField(max_length=128)
     minor_data = models.CharField(max_length=256)
-    one_or_many_input_files = models.CharField(max_length=32)
+    score = models.CharField(max_length=256)
+    key_value = models.CharField(max_length=256)
+    created_on = models.DateTimeField(auto_now=True)
+
+
+class Reference(models.Model):
+    short_name = models.CharField(max_length=64, unique=True)
+    description = models.CharField(max_length=2048)
+    reference_type = models.CharField(max_length=64)
+    placeholder = models.CharField(max_length=256)
+
+    script = models.TextField()
+    completed = models.CharField(max_length=256)
+    special = models.CharField(max_length=256)
+    created_by = models.CharField(max_length=256)
+    subfolder_path = models.CharField(max_length=256)
+    dependencies = models.TextField()
     score = models.CharField(max_length=256)
     key_value = models.CharField(max_length=256)
     created_on = models.DateTimeField(auto_now=True)

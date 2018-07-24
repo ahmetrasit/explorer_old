@@ -43,6 +43,25 @@ class StepForm(ModelForm):
             })
 
 
+class ReferenceForm(ModelForm):
+    ref_raw_script = forms.CharField(widget=forms.HiddenInput(), required=False)
+
+    class Meta:
+        model = Reference
+        fields = ['ref_raw_script', 'short_name', 'description', 'reference_type', 'placeholder']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            curr_class = 'form-control'
+            self.fields[field].widget.attrs.update({
+                'class': curr_class,
+                'id':field,
+                'rows':'1',
+                'autocomplete':'none'
+            })
+
+
 class MajorDataCategoryForm(ModelForm):
     class Meta:
         model = MajorDataCategory

@@ -8,12 +8,12 @@
 	{% block body %}
 	<div class="container">
 		<div class="jumbotron">
-			<h1>Create Major Data Category</h1>
+			<h1>Create Analysis Step</h1>
 			<p>You can add major data categories to make data exploration more intuitive. Just think about intermediatery data points that might benefit from a branching what-if analysis.</p>
 
 			<div class="row">
 				<div class="col-md-12">
-					{% include "templates/_create_process_modal.html" %}
+					{% include "templates/_create_step_modal.html" %}
 
 				</div>
 
@@ -37,26 +37,29 @@
 
 
 
-
-	<div class="row">
-    {% for field in step_fields %}
-		<div class="col-md-2">
-			<label><b>{{field|title }}</b></label>
-		</div>
-		{% endfor %}
-
-	</div>
-
-	{% for step in steps %}
-	<div class="row">
-			{% for key,value in step.items %}
-				<div class="col-md-2">
-					{{value}}
-				</div>
+	<table class="table table-responsive table-bordered table-striped text-center" align='center' style="margin: 0 auto !important;width: 100% !important; ">
+		<thead>
+			<tr>
+		    {% for field in step_fields %}
+				<th style="font-size:.8em" class='m-0 p-1'>
+					{{field }}
+				</th>
 				{% endfor %}
+			</tr>
+		</thead>
+		<tbody>
+			{% for step in steps %}
+			<tr>
+				{% for key,value in step.items %}
+					<td style="font-size:.8em" class='m-0 p-1'>
+						{{value}}
+					</td>
+				{% endfor %}
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
-	</div>
-	{% endfor %}
 
 
 
