@@ -23,7 +23,7 @@ def homepage(request):
     render_dict = getConfigDict(request)
     render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
     render_dict['reference_form'] = ReferenceForm()
-    print(MajorDataCategory.objects.values_list('category', flat=True))
+    #print(MajorDataCategory.objects.values_list('category', flat=True))
     return render(request, 'homepage.html', render_dict)
 
 
