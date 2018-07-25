@@ -25,7 +25,8 @@ class MainConfiguration(models.Model):
 class MajorDataCategory(models.Model):
     category = models.CharField(max_length=32, unique=True)
     description = models.CharField(max_length=256)
-    special = models.CharField(max_length=32, blank=True, null=True)
+    sample_schema = models.CharField(max_length=256, blank=True, null=True)
+    special = models.CharField(max_length=128, blank=True, null=True)
     created_on = models.DateTimeField(auto_now=True)
 
 
@@ -35,7 +36,7 @@ class Step(models.Model):
     ACCESS = ((access, access) for access in ('public', 'private'))
     STATUS = ((status, status) for status in ('tested', 'experimental'))
     SPECIAL = ((special, special) for special in ('regular', 'upload', 'other'))
-    NO_OF = ((no_of, description) for description, no_of in (('one output per one input file', 'one'), ('many outputs of the same kind', 'many')))
+    NO_OF = ((no_of, description) for description, no_of in (('one output', 'one'), ('many outputs of the same kind', 'many')))
     RELATIONSHIP = ((relation, description) for description, relation in (('1 input file for 1 output', '1:1'), ('1 input file processed for many outputs', '1:*'), ('many input files for 1 output', '*>1'), ('many input files processed together for many outputs', '*>*'), ('Each input file corresponds to an individual output', '*:*')))
 
     short_name = models.CharField(max_length=64, unique=True)

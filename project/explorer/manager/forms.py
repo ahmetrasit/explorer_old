@@ -65,11 +65,10 @@ class ReferenceForm(ModelForm):
 class MajorDataCategoryForm(ModelForm):
     class Meta:
         model = MajorDataCategory
-        fields = ['category', 'description']
+        fields = ['category', 'description', 'sample_schema']
 
 
     def __init__(self, *args, **kwargs):
-        widths = {'category':3, 'description':9}
         super().__init__(*args, **kwargs)
         for field in iter(self.fields):
             self.fields[field].widget.attrs.update({
