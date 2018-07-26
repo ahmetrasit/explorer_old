@@ -124,8 +124,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="{% static 'js/fileUpload.js' %}"></script>
     <script type="text/javascript">
-      //var genotype_options = {{genotype_options | safe}}
-      //var sample_type_options = {{sample_type_options | safe}}
+      var data_categories = {{data_categories | safe}}
+
+      d3.selectAll('div#data_categories').selectAll('select').remove()
+      d3.selectAll('div#data_categories').append('select').attr('class', 'form-control').attr('id', 'data_categories_select')
+        .selectAll('option').data(['Select data category'].concat(data_categories)).enter()
+        .append('option').text(function(d,i){return d}).attr('disabled', function(d,i){
+          if (i==0) {return true;}
+        })
+
 
     </script>
 

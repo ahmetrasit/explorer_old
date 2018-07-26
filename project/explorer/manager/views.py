@@ -117,7 +117,6 @@ def addDataCategory(request):
     render_dict = getConfigDict(request)
     if request.user.username == 'admin':
         form = MajorDataCategoryForm
-
         render_dict['form']=form()
         if request.method == 'POST':
             formInput = form(request.POST)
@@ -173,14 +172,13 @@ def editMainConfiguration(request):
 
 def getConfigDict(request):
     render_dict = {'user':request.user, 'no_of_samples':0}
-    #render_dict['login_form'] = PickyAuthenticationForm()
+    render_dict['data_categories'] = list(MajorDataCategory.objects.values_list('category', flat=True))
     last = MainConfiguration.objects.last()
     if last:
         system_config = model_to_dict(last)
         for key in ['team_name', 'intro_message']:
             render_dict[key] = system_config[key]
     return render_dict
-
 
 
 def getInputs(script):

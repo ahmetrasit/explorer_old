@@ -5,6 +5,8 @@ var selected_files
 var file_types
 
 
+
+
 fileSelect.onchange = function(event){
   selected_files = []
   file_types = new Set()
@@ -18,6 +20,11 @@ fileSelect.onchange = function(event){
   d3.selectAll('.noof_inputs').style('display', 'none')
   $('#file_label').html('Choose file')
   if (file_types.size == 1) {
+    var curr_file_type = [...file_types][0]
+    var existing_category = data_categories.indexOf(curr_file_type)
+    if (existing_category > -1) {
+      alert(existing_category)
+    }
     if (selected_files.length == 1){
       d3.select('#single_input').style('display', 'block')
       $('#file_label').html('1 file selected')
@@ -26,7 +33,7 @@ fileSelect.onchange = function(event){
       $('#file_label').html(selected_files.length + ' files selected')
     }
   }else if (file_types.size > 1) {
-    alert('Please be sure that all files are in the same type.')
+    alert('Please be sure that all files are of the same type.')
   }else {
     //do nothing
   }
