@@ -218,9 +218,13 @@ def getParameters(script):
 
 
 @csrf_exempt
-def uploadFASTQ(request):
+def upload(request):
     success = False
     if request.method == 'POST':
+        names = request.POST.keys()
+        print(names)
+        for name in names:
+            print(name, request.POST.getlist(name))
         for i in range(len(request.FILES.getlist('filesToUpload'))):
             file = request.FILES.getlist('filesToUpload')[i]
             filename = str(file)

@@ -127,7 +127,7 @@
       var data_categories = {{data_categories | safe}}
 
       d3.selectAll('div#data_categories').selectAll('select').remove()
-      d3.selectAll('div#data_categories').append('select').attr('class', 'form-control').attr('id', 'data_categories_select')
+      d3.selectAll('div#data_categories').append('select').on('change', uploadFileTypeChange).attr('class', 'form-control').attr('id', 'data_categories_select')
         .selectAll('option').data(['Select data category'].concat(data_categories)).enter()
         .append('option').text(function(d,i){return d}).attr('disabled', function(d,i){
           if (i==0) {return true;}

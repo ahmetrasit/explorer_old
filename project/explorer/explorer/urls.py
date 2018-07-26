@@ -20,7 +20,7 @@ urlpatterns = [
     url(r'^add/step$', manager_views.addStep, name='addStep'),
 
     url(r'^login/$', auth_views.login, {'template_name': 'homepage.html'}),
-    url(r'^uploadFASTQ/$', manager_views.uploadFASTQ, name='uploadFASTQ'),
+    url(r'^upload/$', manager_views.upload, name='upload'),
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', auth_views.logout, name='logout'),
 ]
