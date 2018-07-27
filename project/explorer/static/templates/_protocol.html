@@ -1,0 +1,56 @@
+<div id="svg_area">
+
+</div>
+
+<script>
+  var svg = d3.select('#svg_area')
+              .append('svg').attr('height', 500).attr('width', 1000).style('background-color', 'lightgray')
+
+  var stepList = [6,3,7,8,6,3,7,8,6,3,7,8] //contains step pk IDs
+
+  function reDraw(circles) {
+    d3.select('#svg_area').select('svg').remove()
+    svg = d3.select('#svg_area')
+                .append('svg').attr('height', 500).attr('width', 1000).style('background-color', 'lightgray')
+    var xScale = d3.scaleLinear()
+        .domain([0, circles.length])
+        .range([100, 900]);
+
+    // add first one as rectangle
+
+    for (var i = 1; i < circles.length; i++) {
+      drawStepCircle(i, xScale(i), xScale(0)*.3)
+    }
+
+    //modify last one
+    modifyLastOne(stepList.length-1)
+  }
+
+
+  function drawStepCircle(i, cx, r){
+    //draw an arrow between this and previous one
+    svg.append('circle').attr('id', 'main_'+i)
+      .attr('cx', cx).attr('cy', 200).attr('r', r).style('fill', 'ivory')
+    svg.append('circle').attr('id', 'in_'+i)
+      .attr('cx', cx-r).attr('cy', 200).attr('r', r/4).style('fill', 'lightgreen')
+    svg.append('circle').attr('id', 'out_'+i)
+      .attr('cx', cx+r).attr('cy', 200).attr('r', r/4).style('fill', 'lightblue')
+
+    }
+
+
+    function modifyLastOne(index) {
+      //change properties of last One
+      //change out_index color
+      //add onclick to out_index
+      //add delete button
+
+      // var lastElement = stepList[stepList.length-1]
+      // lastCategory = upload_steps.filter(x=>x.pk==lastElement)[0].fields.output_major_data_category
+      // filteredSteps = upload_steps.filter(x=>x.fields.input_major_data_category==lastCategory)
+    }
+
+    function rePopulateSelect(filteredFunctions){
+
+    }
+</script>
