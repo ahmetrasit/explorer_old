@@ -177,7 +177,7 @@ def getConfigDict(request):
     render_dict = {'user':request.user, 'no_of_samples':0}
     render_dict['data_categories'] = list(MajorDataCategory.objects.values_list('category', flat=True))
     render_dict['upload_steps'] = serializers.serialize('json', Step.objects.filter(special='upload'))
-    print(render_dict['upload_steps'])
+    render_dict['steps'] = serializers.serialize('json', Step.objects.all())
     last = MainConfiguration.objects.last()
     if last:
         system_config = model_to_dict(last)
