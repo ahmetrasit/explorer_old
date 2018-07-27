@@ -31,12 +31,9 @@
           </div>
         </div>
 
-
-
-
         <br>
-        <div class="input-group mb-3 noof_inputs" id='single_input' style="display:none">
 
+        <div class="input-group mb-3 noof_inputs" id='single_input' style="display:none">
           <ul class="nav nav-tabs" id="single_input_tab" role="tablist">
             <li class="nav-item">
               <a class="nav-link active" id="OneToOne-tab" data-toggle="tab" href="#OneToOne" role="tab" aria-controls="OneToOne" aria-selected="true"><b>Input file represents a single sample</b></a>
@@ -50,12 +47,20 @@
               <b>Input file represents a single sample</b>
               <div class="show_also_filename">
               </div>
+              <div class="upload_steps">
+              </div>
+              <div class="explanation">
+              </div>
             </div>
             <div class="rounded-bottom p-3 border-bottom border-left border-right tab-pane fade" id="OneToMany" role="tabpanel" aria-labelledby="OneToMany-tab">
               <b>Extract many samples from input file</b>
+              <div class="multi_samples">
+              </div>
               <div class="show_only_samples">
               </div>
-              <div class="multi_samples">
+              <div class="upload_steps">
+              </div>
+              <div class="explanation">
               </div>
             </div>
           </div>
@@ -79,17 +84,29 @@
               All inputs belongs together to a single sample
               <div class="show_only_samples">
               </div>
+              <div class="upload_steps">
+              </div>
+              <div class="explanation">
+              </div>
             </div>
             <div class="rounded-bottom p-3 border-bottom border-left border-right tab-pane fade" id="ManyToMany" role="tabpanel" aria-labelledby="ManyToMany-tab">
               Merge inputs and extract for many samples
+              <div class="multi_samples">
+              </div>
               <div class="show_only_samples">
               </div>
-              <div class="multi_samples">
+              <div class="upload_steps">
+              </div>
+              <div class="explanation">
               </div>
             </div>
             <div class="rounded-bottom p-3 border-bottom border-left border-right tab-pane fade" id="ManyEachToMany" role="tabpanel" aria-labelledby="ManyEachToMany-tab">
               Each file represents a single sample
               <div class="show_also_filename">
+              </div>
+              <div class="upload_steps">
+              </div>
+              <div class="explanation">
               </div>
             </div>
           </div>

@@ -125,6 +125,7 @@
     <script src="{% static 'js/fileUpload.js' %}"></script>
     <script type="text/javascript">
       var data_categories = {{data_categories | safe}}
+      var upload_steps = {{upload_steps | safe}}
 
       d3.selectAll('div#data_categories').selectAll('select').remove()
       d3.selectAll('div#data_categories').append('select').on('change', uploadFileTypeChange).attr('class', 'form-control').attr('id', 'data_categories_select')

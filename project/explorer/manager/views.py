@@ -78,8 +78,11 @@ def getScriptInputOutputCategory(raw_script):
     script = html.unescape(raw_script)
     script = re.sub(r'<\/?span[^>]*>', '', script)
     script = re.sub(r'<\/?p[^_>]*>', '', script)
-    inputs = re.findall(r'(<[fsid][smyp]_[\w.-]+)\W', script)
+    inputs = re.findall(r'(<[fsid][smyp]_[\w\.-]+)', script)
     input_major_data_category = '_|_'.join([re.sub(r'^<\w\w_', '', curr) for curr in inputs if re.match('<f', curr)])
+    print(script)
+    print(inputs)
+    print(input_major_data_category)
     outputs = re.findall(r'(>[f]_[\w.-]+)\W', script)
     #output_major_data_category = '_|_'.join([re.sub(r'^>f_', '', curr) for curr in outputs if re.match('>f', curr)])
 
@@ -173,6 +176,8 @@ def editMainConfiguration(request):
 def getConfigDict(request):
     render_dict = {'user':request.user, 'no_of_samples':0}
     render_dict['data_categories'] = list(MajorDataCategory.objects.values_list('category', flat=True))
+    render_dict['upload_steps'] = serializers.serialize('json', Step.objects.filter(special='upload'))
+    print(render_dict['upload_steps'])
     last = MainConfiguration.objects.last()
     if last:
         system_config = model_to_dict(last)
