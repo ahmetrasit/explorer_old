@@ -76,3 +76,31 @@ class Reference(models.Model):
     score = models.CharField(max_length=256)
     key_value = models.CharField(max_length=256)
     created_on = models.DateTimeField(auto_now=True)
+
+
+class Task(models.Model):
+    step_id = models.IntegerField()
+    protocol_id = models.IntegerField()
+    process_id = models.IntegerField()
+    retry_of = models.IntegerField(blank=True, null=True)
+    depends_on = models.IntegerField(blank=True, null=True)
+
+    input_file = models.TextField()
+    script = models.TextField()
+    folder_path = models.TextField()
+    major_types = models.TextField()
+    minor_types = models.TextField(blank=True, null=True)
+    save_outputs_zipped = models.CharField(max_length=64)
+
+    created_by = models.CharField(max_length=256)
+    created_for = models.CharField(max_length=256, blank=True, null=True)
+    created_on = models.CharField(max_length=64)
+    started_on = models.CharField(max_length=64, blank=True, null=True)
+    finished_on = models.CharField(max_length=64, blank=True, null=True)
+    is_last = models.CharField(max_length=64)
+    status = models.CharField(max_length=64)
+    finished_status = models.CharField(max_length=64, blank=True, null=True)
+    retries_left = models.IntegerField()
+
+    special = models.CharField(max_length=64, blank=True, null=True)
+    key_value = models.CharField(max_length=64, blank=True, null=True)

@@ -252,3 +252,8 @@ def handle_uploaded_file(f, filename, foldername, username):
     except Exception as e:
         print('Error:{} for {}'.format(filename, e))
         return False
+
+
+def createTask():
+    #use setattr for iterating through a list of items
+    pass
