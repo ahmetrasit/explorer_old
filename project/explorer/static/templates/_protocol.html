@@ -90,8 +90,26 @@
       stepList.push(stepListOrg.filter(x=>x.fields.short_name==selected_value)[0])
       reDraw(stepList)
       $('#ModalCenter').modal('hide');
-
     }
+
+    function search_step() {
+      var new_data_list = []
+      d3.select("#data_category_start").remove()
+      for (var i = 0; i < filteredStepsSN.length; i++) {
+        if (filteredStepsSN[i].includes(document.getElementById("search_step_input").value)) {
+          new_data_list.push(filteredStepsSN[i])}
+      }
+
+     d3.select("#modalBody")
+         .append("select")
+         .attr("id","data_category_start")
+         .selectAll('option')
+          .data(new_data_list).enter()
+          .append('option')
+          .attr("value",function (d) { ;return d; })
+          .text(function (d) { return d; });
+       }
+
 
 </script>
 <div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -104,6 +122,7 @@
         </button>
       </div>
       <div class="modal-body" id="modalBody">
+        <input type="search" class="form-control" id="search_step_input"  placeholder="Search Step" onchange="search_step()">
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="append_step()">Add</button>
