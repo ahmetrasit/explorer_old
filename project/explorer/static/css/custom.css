@@ -135,5 +135,11 @@
 
 .arrow{
 		stroke-width:3;
-		stroke:darkgray;
+		stroke:darkslategray;
+    fill:darkslategray;
+	}
+
+.arrowHead{
+    fill:darkslategray;
+		stroke:darkslategray;
 	}
