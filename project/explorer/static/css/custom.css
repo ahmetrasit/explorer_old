@@ -131,3 +131,9 @@
 .modal {
   overflow-y:auto !important;
 }
+
+
+.arrow{
+		stroke-width:3;
+		stroke:darkgray;
+	}

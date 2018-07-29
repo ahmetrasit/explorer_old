@@ -11,6 +11,8 @@
       <div class="modal-body">
         <div id="svg_area">
         </div>
+        <div id="current_step_description">
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger input-group-text" onclick="clearProtocol()">Clear</button>
@@ -99,9 +101,26 @@
         .domain([0, 10])
         .range([0, svg_height]);
 
+    defs = svg.append("defs")
+    var data = [
+                  { id: 'circle', name: 'circle', path: 'M 0, 0  m -5, 0  a 5,5 0 1,0 10,0  a 5,5 0 1,0 -10,0', viewbox: '-6 -6 12 12', class:'arrowHead' },
+                  { id: 'arrow', name: 'arrow', path: 'M 0,0 m -5,-5 L 5,0 L -5,5 Z', viewbox: '-5 -5 10 10', class:'arrowHead' },
+                ]
+
+  var marker = defs.selectAll('marker').data(data).enter()
+                  .append('svg:marker').attr('id', function(d){ return d.name})
+                    .attr('markerHeight', function(d,i){if(i==0){return 2.5}else{return 3.5}})
+                    .attr('markerWidth', function(d,i){if(i==0){return 2.5}else{return 3.5}})
+                    .attr('orient', 'auto').attr('refX', 0).attr('refY', 0)
+                    .attr('viewBox', function(d){ return d.viewbox })
+                    .append('svg:path')
+                      .attr('d', function(d){ return d.path }).attr('class', function(d){ return d.class })
+                      .style('fill', 'darkgray')
+
     for (var i = 0; i < (protocol_steps.length || 1); i++) {
       drawStepRect(i, protocol_steps, svg, xScale, yScale)
     }
+
     colorizeStepRect(svg, protocol_steps, xScale,yScale)
 
     if (protocol_steps.length<2) {
@@ -133,16 +152,20 @@
       var output_category = steps.filter(x=>x.pk==protocol_steps[i])[0].fields.output_major_data_category
       d3.select('#in_'+i).style('fill', category_colors(data_categories.indexOf(input_category))).style('opacity', .5)
       d3.select('#out_'+i).style('fill', category_colors(data_categories.indexOf(output_category))).style('opacity', .5)
+      d3.select('#main_'+i).on('mouseover', showCurrDescription).on('mouseout', hideCurrDescription)
+      d3.select('#text_'+i).on('mouseover', showCurrDescription).on('mouseout', hideCurrDescription)
     }
 
     var lastStep = d3.select('#out_'+(protocol_steps.length - 1))
     lastStep.on('click', addStep).on('mouseover', highlight).on('mouseout', usual).style('opacity', 1).attr('r', yScale(1.2))
   }
 
+
   function deleteLastStep() {
     protocol_steps.splice(-1,1)
     reDraw(protocol_steps)
   }
+
 
   function highlight() {
     document.getElementById('add_step').style['stroke'] = 'red'
@@ -195,6 +218,16 @@
     svg.append('circle').attr('id', 'out_'+i)
       .attr('cx', xScale(i+1.4)-radius*1.1).attr('cy', yScale(5)).attr('r', radius)
       .style('stroke-width', '2px').style('stroke', 'gray').style('fill', 'white')
+
+    if (i>0) {
+      svg.append('line').attr('id', 'line_'+i).attr('class', 'arrow')
+          .attr("x1", parseFloat(d3.select('#out_'+(i-1)).attr('cx')))
+          .attr("y1", d3.select('#out_'+(i-1)).attr('cy'))
+          .attr("x2", xScale(i+.6)+radius*1.1)
+          .attr("y2", yScale(5))
+  				.attr("marker-end", "url(#arrow)")
+          .attr("marker-start", "url(#circle)")
+    }
   }
 
 
@@ -216,7 +249,6 @@
 
   function addStep() {
     $('#selectStepModal').modal('show')
-    //$('#createProtocolModal').modal('hide')
     document.getElementById('createProtocolModal').style.opacity = .3
     filterStepSelect()
   }
@@ -225,7 +257,6 @@
   function stepSelected() {
     var select = document.getElementById('select_step_select')
     $('#selectStepModal').modal('hide')
-    //$('#createProtocolModal').modal('show')
     document.getElementById('createProtocolModal').style.opacity = 1
     var selectedStep = select.options[select.selectedIndex].value
     protocol_steps.push(selectedStep)
@@ -234,8 +265,14 @@
 
 
   function showStepDescription() {
+    d3.select('#step_description').select('div').remove()
     var select = document.getElementById('select_step_select')
-    document.getElementById('step_description').innerHTML = steps.filter(x=>x.pk==select.options[select.selectedIndex].value)[0].fields.description
+    var curr_step = steps.filter(x=>x.pk==select.options[select.selectedIndex].value)[0].fields
+    var div = d3.select('#step_description').append('div').attr('class', 'row')
+    div.append('div').attr('class', 'col-md-2').html('<b>Accepts</b><br>' + curr_step.input_major_data_category)
+    div.append('div').attr('class', 'col-md-8').html(curr_step.description)
+    div.append('div').attr('class', 'col-md-2').html('<b>Outputs</b><br>' + curr_step.output_major_data_category)
+
   }
 
 
@@ -256,6 +293,7 @@
     showStepDescription()
   }
 
+
   function saveProtocol() {
     console.log(protocol_steps);
   }
@@ -264,6 +302,21 @@
   function clearProtocol() {
     protocol_steps = []
     reDraw(protocol_steps)
+  }
+
+
+  function showCurrDescription() {
+    var index = this.id.split("_")[1]
+    var curr_step = steps.filter(x=>x.pk==this.id.split("_")[1])[0].fields
+    var div = d3.select('#current_step_description').append('div').attr('class', 'row')
+    div.append('div').attr('class', 'col-md-2').html('<b>Accepts</b><br>' + curr_step.input_major_data_category)
+    div.append('div').attr('class', 'col-md-8').html(curr_step.description)
+    div.append('div').attr('class', 'col-md-2').html('<b>Outputs</b><br>' + curr_step.output_major_data_category)
+  }
+
+
+  function hideCurrDescription() {
+    document.getElementById('current_step_description').innerHTML = ''
   }
 
 </script>
