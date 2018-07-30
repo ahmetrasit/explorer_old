@@ -9,7 +9,7 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from django.http import JsonResponse
-from .models import *
+from .requestHandler import requestHandler as rh
 from .forms import *
 import os
 import re
@@ -23,6 +23,8 @@ def homepage(request):
     render_dict = getConfigDict(request)
     render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
     render_dict['reference_form'] = ReferenceForm()
+
+    #rh.submitRequest()
     #print(MajorDataCategory.objects.values_list('category', flat=True))
     return render(request, 'homepage.html', render_dict)
 
@@ -67,7 +69,7 @@ def getFolderName(username, type):
     if type in types:
         curr_time = int(time.time())
         rand_num = random.randint(111111,999999)
-        folderName = 'static/{}/{}_{}_{}'.format(types[type], username, curr_time, rand_num)
+        folderName = 'data/{}/{}_{}_{}/'.format(types[type], username, curr_time, rand_num)
 
     return folderName
 
@@ -227,14 +229,14 @@ def upload(request):
     success = False
     if request.method == 'POST':
         names = request.POST.keys()
-        print(names)
         for name in names:
             print(name, request.POST.getlist(name))
+
+        random_folder = getFolderName(request.user.username, 'upload')
         for i in range(len(request.FILES.getlist('filesToUpload'))):
             file = request.FILES.getlist('filesToUpload')[i]
             filename = str(file)
-            random_folder = str(int(time.time())) + str(random.randint(111111, 999999)) + '/'
-            success = success and handle_uploaded_file(file, filename, random_folder, request.user.username)
+            success = handle_uploaded_file(file, filename, random_folder, request.user.username)
     return HttpResponse()
 
 
@@ -243,9 +245,10 @@ def handle_uploaded_file(f, filename, foldername, username):
     try:
         os.mkdir(foldername)
     except Exception as e:
-        print('Error:{} for {}'.format(foldername, e))
+        if '[Errno 17]' not in str(e):
+            print('Error:{} for {}'.format(foldername, e))
     try:
-        with open(foldername + '/' +  filename, 'wb+') as destination:
+        with open(foldername +  filename, 'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
         return True

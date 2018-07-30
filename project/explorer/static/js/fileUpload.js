@@ -58,6 +58,19 @@ function prepareFields(sample_other_fields) {
   d3.selectAll('.show_only_samples').selectAll('div').remove()
   addSampleInputPerSample(sample_input_fields, false)
   addSampleInputButton(sample_input_fields)
+
+  var select = $('.active').find('div:visible').find('.uploadStepSelect')
+  if (select.length == 1) {
+    if (select[0].selectedIndex == 0) {
+      for (variable of $('input')) {
+        variable.disabled = true
+      }
+    }else {
+      for (variable of $('.active').find('div:visible').find('input')) {
+        variable.disabled = false
+      }
+    }
+  }
 }
 
 
@@ -150,6 +163,14 @@ function uploadFiles(){
      formData.append(variable.name, variable.value.trim())
    }
 
+   for (variable of $('.active').find('div:visible').find('select')) {
+     formData.append(variable.name, variable.options[variable.selectedIndex].value)
+   }
+
+   var selected_category = document.getElementById('data_categories_select')
+   formData.append('data_category', selected_category.options[selected_category.selectedIndex].value)
+
+
   var xhr = new XMLHttpRequest()
   xhr.open('POST', '/upload/', true);
   xhr.upload.addEventListener('progress', onProgress, false);
@@ -217,7 +238,7 @@ function prepareUploadSteps(upload_steps, data_type) {
         d3.select('#'+relationships[type]).select('.show_only_samples').style('display', 'block')
         d3.select('#'+relationships[type]).select('.multi_samples').style('display', 'block')
         d3.select('#'+relationships[type]).select('.explanation').html('')
-        d3.select('#'+relationships[type]).select('.upload_steps').append('select').on('change', uploadStepChange).attr('class', 'form-control mt-2').selectAll('option').data(regular).enter()
+        d3.select('#'+relationships[type]).select('.upload_steps').append('select').attr('name', 'selected_upload_step').on('change', uploadStepChange).attr('class', 'form-control mt-2 uploadStepSelect').selectAll('option').data(regular).enter()
                           .append('option').text(function(d){return d.fields.short_name}).attr('value', function(d){return d.pk})
       }else {
         d3.select('#'+relationships[type]).select('.show_only_samples').style('display', 'none')
@@ -227,7 +248,7 @@ function prepareUploadSteps(upload_steps, data_type) {
 
     }else {
       var regular = [{pk:-2, fields:{'short_name':'Select upload method'}}, {pk:-1, fields:{'short_name':'just upload'}}].concat(filtered)
-      d3.select('#'+relationships[type]).select('.upload_steps').append('select').on('change', uploadStepChange).attr('class', 'form-control mt-2').selectAll('option').data(regular).enter()
+      d3.select('#'+relationships[type]).select('.upload_steps').append('select').attr('name', 'selected_upload_step').on('change', uploadStepChange).attr('class', 'form-control mt-2 uploadStepSelect').selectAll('option').data(regular).enter()
                         .append('option').text(function(d){return d.fields.short_name})
                           .attr('value', function(d){return d.pk}).attr('disabled', function(d,i){if (i == 0) {return true}})
     }

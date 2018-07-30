@@ -1,1 +1,1 @@
-print('>> init.py is here')
+print('>> init.py for manager app is here')
