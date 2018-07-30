@@ -61,15 +61,7 @@ function prepareFields(sample_other_fields) {
 
   var select = $('.active').find('div:visible').find('.uploadStepSelect')
   if (select.length == 1) {
-    if (select[0].selectedIndex == 0) {
-      for (variable of $('input')) {
-        variable.disabled = true
-      }
-    }else {
-      for (variable of $('.active').find('div:visible').find('input')) {
-        variable.disabled = false
-      }
-    }
+
   }
 }
 

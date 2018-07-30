@@ -37,7 +37,7 @@ def addStep(request):
     if request.method == 'POST':
         formInput = form(request.POST)
         if formInput.is_valid():
-            step_folder = getFolderName(request.user.username, 'step')
+            step_folder = requestNewFolder(request.user.username, 'step')
             step_filenames = []
             for i in range(len(request.FILES.getlist('stepFiles'))):
                 file = request.FILES.getlist('stepFiles')[i]
@@ -62,7 +62,7 @@ def addStep(request):
     return render(request, 'addStep.html', render_dict)
 
 
-def getFolderName(username, type):
+def requestNewFolder(username, type):
     #temp:temporary, perm:permanent
     types = {'upload':'temp', 'task':'temp', 'step':'perm', 'data_point':'perm'}
     folderName = '!'
@@ -232,11 +232,20 @@ def upload(request):
         for name in names:
             print(name, request.POST.getlist(name))
 
-        random_folder = getFolderName(request.user.username, 'upload')
-        for i in range(len(request.FILES.getlist('filesToUpload'))):
-            file = request.FILES.getlist('filesToUpload')[i]
+        upload_folder = requestNewFolder(request.user.username, 'upload')
+        uploaded_files = request.FILES.getlist('filesToUpload')
+        filenames = (str(file) for file in uploaded_files)
+        for i in range(len(uploaded_files)):
+            file = uploaded_files[i]
             filename = str(file)
-            success = handle_uploaded_file(file, filename, random_folder, request.user.username)
+            success = handle_uploaded_file(file, filename, upload_folder, request.user.username)
+        if success:
+            input_parameters = ((name, request.POST.getlist(name)) for name in request.POST.keys())
+            other_parameters = ('data_category', request.POST['data_category'])
+            submit_request = rh(request.user.username)
+            submit_request.submitRequest(request.POST['selected_upload_step'], filenames, input_parameters, other_parameters)
+
+
     return HttpResponse()
 
 
