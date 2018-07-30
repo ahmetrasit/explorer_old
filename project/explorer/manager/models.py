@@ -104,3 +104,33 @@ class Task(models.Model):
 
     special = models.CharField(max_length=64, blank=True, null=True)
     key_value = models.CharField(max_length=64, blank=True, null=True)
+
+
+class DataPoint(models.Model):
+    short_name = models.CharField(max_length=256)
+    description = models.CharField(max_length=2048)
+
+    protocol_id = models.IntegerField(blank=True, null=True)
+    step_id = models.IntegerField()
+    task_id = models.IntegerField(blank=True, null=True)
+    ancestry = models.TextField(blank=True, null=True)
+
+    created_by = models.CharField(max_length=256)
+    created_for = models.CharField(max_length=256, blank=True, null=True)
+    created_on = models.CharField(max_length=64)
+    folder_path = models.TextField()
+    access_list = models.TextField(blank=True, null=True)
+
+    major_types = models.TextField()
+    minor_types = models.TextField(blank=True, null=True)
+    source_file = models.TextField()
+    input_files = models.TextField()
+    output_files = models.TextField()
+
+    zipped = models.CharField(max_length=64, blank=True, null=True)
+    projects = models.TextField(blank=True, null=True)
+    special = models.CharField(max_length=64, blank=True, null=True)
+    size = models.TextField()
+
+    special = models.CharField(max_length=64, blank=True, null=True)
+    key_value = models.TextField()
