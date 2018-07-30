@@ -192,9 +192,9 @@ function uploadFiles(){
   if (fileSelect.files.length > 0) {
     if (activeInputsNotEmpty()) {
       xhr.send(formData);
-      $('#file_label').html('Choose file')
-      d3.selectAll('.noof_inputs').style('display', 'none')
-      $('#fileUploadModal').modal('hide')
+      //$('#file_label').html('Choose file')
+      //d3.selectAll('.noof_inputs').style('display', 'none')
+      //$('#fileUploadModal').modal('hide')
     }
   }else {
     d3.select('.custom-file').style('box-shadow', '0px 0px 3px 3px red')

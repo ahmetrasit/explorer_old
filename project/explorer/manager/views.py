@@ -69,7 +69,7 @@ def requestNewFolder(username, type):
     if type in types:
         curr_time = int(time.time())
         rand_num = random.randint(111111,999999)
-        folderName = 'data/{}/{}_{}_{}/'.format(types[type], username, curr_time, rand_num)
+        folderName = 'data/{}/{}_{}/'.format(types[type], curr_time, rand_num)
 
     return folderName
 
@@ -234,7 +234,7 @@ def upload(request):
 
         upload_folder = requestNewFolder(request.user.username, 'upload')
         uploaded_files = request.FILES.getlist('filesToUpload')
-        filenames = (str(file) for file in uploaded_files)
+        filenames = [upload_folder + str(file) for file in uploaded_files]
         for i in range(len(uploaded_files)):
             file = uploaded_files[i]
             filename = str(file)
