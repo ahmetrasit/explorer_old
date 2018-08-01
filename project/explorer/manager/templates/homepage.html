@@ -38,6 +38,37 @@
 				<div id="data_point_svg">
 
 				</div>
+
+
+
+
+				<div class="modal" id="selectStepFromDataPointModal" tabindex="-1" role="dialog">
+				  <div class="modal-dialog" role="document">
+				    <div class="modal-content">
+				      <div class="modal-header">
+				        <h5 class="modal-title">Select Analysis Step</h5>
+				        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				          <span aria-hidden="true">&times;</span>
+				        </button>
+				      </div>
+				      <div class="modal-body">
+				        <div>
+				          <input class="form-control" type="text" id="select_step_input_dp" value="" onkeyup="filterStepSelectDP()">
+				          <select class="form-control" id="select_step_select_dp" onchange="showStepDescriptionDP()">
+				          </select>
+				          <div id='step_description_dp'>
+				          </div>
+				        </div>
+				      </div>
+				      <div class="modal-footer">
+				        <button type="button" class="btn btn-primary" onclick="stepSelectedDP()">Select</button>
+				        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+
+
 			{%endif%}
 		{%endif%}
 
@@ -55,12 +86,82 @@
 	<script type="text/javascript">
 			var data_points = {{data_points | safe}}
 
+			function filterStepSelectDP() {
+				var selected_node = right_click_data_point
+				last_output_category = data_points.filter(x=>x.pk==selected_node)[0].fields.major_types
+
+		    var filteredSteps = steps.filter(x=>x.fields.input_major_data_category==last_output_category)
+		    var typed = document.getElementById('select_step_input_dp').value.trim()
+		    if (typed.length > 0) {
+		      filteredSteps = filteredSteps.filter(x=>x.fields.short_name.includes(typed) | x.fields.description.includes(typed))
+		    }
+
+		    d3.select('#select_step_select_dp').selectAll('option').remove()
+		    d3.select('#select_step_select_dp').selectAll('option').data(filteredSteps).enter()
+		      .append('option').text(function(d,i){return d.fields.short_name}).attr('value', function(d){return d.pk})
+		    showStepDescriptionDP()
+		  }
+
+
+			function showStepDescriptionDP() {
+				d3.select('#step_description_dp').select('div').remove()
+				var select = document.getElementById('select_step_select_dp')
+				var curr_step = steps.filter(x=>x.pk==select.options[select.selectedIndex].value)[0].fields
+				var div = d3.select('#step_description_dp').append('div').attr('class', 'row')
+				div.append('div').attr('class', 'col-md-2').html('<b>Accepts</b><br>' + curr_step.input_major_data_category)
+				div.append('div').attr('class', 'col-md-8').html(curr_step.description)
+				div.append('div').attr('class', 'col-md-2').html('<b>Outputs</b><br>' + curr_step.output_major_data_category)
+			}
+
+
+			function stepSelectedDP() {
+				var select = document.getElementById('select_step_select_dp')
+				$('#selectStepFromDataPointModal').modal('hide')
+				var selectedStep = select.options[select.selectedIndex].value
+				submitAnalysisRequest(selectedStep)
+			}
+
+
+			function submitAnalysisRequest(step_id) {
+			  var formData = new FormData();
+
+				formData.append('step_id', step_id)
+				formData.append('reference_data_points', right_click_data_point)
+
+			  var xhr = new XMLHttpRequest()
+			  xhr.open('POST', '/new/step/', true);
+
+
+			  xhr.onload = function () {
+			    if (xhr.status === 200) {
+			      alert('New step created')
+						reDrawTreeWithNewDataPoints()
+			    } else {
+			      alert('Sorry, there is something wrong. Maybe the server is down, or you lost connection.');
+			    }
+			  };
+
+				xhr.send(formData);
+
+			}
+
+
+			function reDrawTreeWithNewDataPoints() {
+				d3.json('/get/data_points/').on('load', function(data) {
+					data_points = JSON.parse(data)
+					createTree(data_points)
+
+			}).mimeType("text/csv")
+    		.get()
+
+
+			}
 
 
 			function createTree(data_points){
 				var simplified = data_points.map(function (x){
 					var anc=x.fields.ancestry.split(',')
-					return {'id':String(x.pk), 'parent':anc[anc.length-1], 'ancestry':anc}
+					return {'id':String(x.pk), 'parent':anc[anc.length-1], 'ancestry':anc, 'category':x.major_types}
 				}).sort(compareLevels)
 
 				var roots = list_to_tree(simplified)
@@ -144,6 +245,7 @@
 		var diagonal = d3.svg.diagonal()
 		    .projection(function(d) { return [d.y, d.x]; });
 
+		d3.select("#data_point_svg").select('#'+svg_id).remove()
 		var svg = d3.select("#data_point_svg").append("svg").attr('id', svg_id)
 		    .attr("width", width + margin.right + margin.left)
 		    .attr("height", height + margin.top + margin.bottom)
@@ -164,11 +266,11 @@
 		    }
 		  }
 
-		  root.children.forEach(collapse);
+		  //root.children.forEach(collapse);
 		  update(root);
 		}
 
-		d3.select(self.frameElement).style("height", "800px");
+		d3.select(self.frameElement).style("height", "300px");
 
 		function update(source) {
 
@@ -177,7 +279,7 @@
 		      links = tree.links(nodes);
 
 		  // Normalize for fixed-depth.
-		  nodes.forEach(function(d) { d.y = d.depth * 180; });
+		  //nodes.forEach(function(d) { d.y = d.depth * 80; });
 
 		  // Update the nodes…
 		  var node = svg.selectAll("g.node")
@@ -188,7 +290,7 @@
 		      .attr("class", "node")
 		      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
 		      .on("click", click).on('contextmenu', function(){
-							right_click_data_point = this.getElementsByTagName('text')[0].innerHTML
+							right_click_data_point = this.getElementsByTagName('hidden')[0].getAttribute('value')
 							d3.event.preventDefault();
 							menu(d3.mouse(this)[0], d3.mouse(this)[1]);
 					});
@@ -198,11 +300,14 @@
 		      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
 
 		  nodeEnter.append("text")
-		      .attr("x", function(d) { return d.children  })
+		      .attr("x", 0)
 		      .attr("dy", ".35em")
 		      .attr("text-anchor", 'middle')
 		      .text(function(d) { return d.id; })
 		      .style("fill-opacity", 1e-6);
+
+			nodeEnter.append("hidden")
+		      .attr('value', function(d) { return d.id; })
 
 		  // Transition nodes to their new position.
 		  var nodeUpdate = node.transition()
@@ -263,7 +368,6 @@
 
 		// Toggle children on click.
 		function click(d) {
-			console.log('ahanda');
 		  if (d.children) {
 		    d._children = d.children;
 		    d.children = null;
@@ -398,7 +502,9 @@
 
 
 	function addAnalysisStepRequest() {
-		console.log(right_click_data_point);
+		//console.log(right_click_data_point);
+		$('#selectStepFromDataPointModal').modal('show')
+		filterStepSelectDP()
 	}
 
 

@@ -17,8 +17,9 @@ class requestHandler:
     #main function to submit request
     def submitRequest(self, reference_data_points, step_id, other_parameters, input_files = [], input_parameters=[], step_type=''):
         if len(reference_data_points) > 0:  #implementing only *:* and 1:1
+            print(reference_data_points)
             new_data_points = [(reference, self.createDataPointFromReference(reference, input_parameters)) for reference in reference_data_points]
-            status = self.createTaskFromReference(new_data_points, step_id, input_parameters, multiTaskStep(step_id))
+            status = self.createTaskFromReference(new_data_points, step_id, input_parameters, self.multiTaskStep(step_id))
         else:   #request from upload
             samples = self.purifySamples(input_files, input_parameters)
             new_data_points = [(sample, self.createDataPointFromUpload(sample, input_parameters, other_parameters)) for sample in samples]
@@ -50,7 +51,7 @@ class requestHandler:
                 pass
 
 
-    def multiTaskStep(step_id):
+    def multiTaskStep(self, step_id):
         if int(step_id) > -1:
             if Step.objects.filter(pk=step_id).values_list('input_output_relationship', flat=True)[0] == '*:*':
                 return True
@@ -81,12 +82,15 @@ class requestHandler:
 
     def createDataPointFromReference(self, reference, input_parameters):
         try:
+            print(reference)
             data_point_folder = views.requestNewFolder(self.username, 'data_point')
+            print(data_point_folder)
             os.mkdir(data_point_folder)
 
             reference_data_point = DataPoint.objects.get(pk=reference)
-            reference_data_point['folder_path'] = data_point_folder
-            reference_data_point[ancestry] = reference_data_point[ancestry] + ',' + reference
+            reference_data_point.pk = None
+            reference_data_point.folder_path = data_point_folder
+            reference_data_point.ancestry = reference_data_point.ancestry + ',' + reference
             reference_data_point.save()
             self.modifyPermissions(data_point_folder)
             return data_point_folder

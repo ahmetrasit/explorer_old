@@ -246,8 +246,21 @@ def upload(request):
             #reference_data_point is null since upload creates the root data point
             submit_request.submitRequest([], request.POST['selected_upload_step'], other_parameters, input_files=filenames, step_type=request.POST['step_type'], input_parameters=input_parameters)
 
+    return HttpResponse()
+
+
+@csrf_exempt
+def addStep(request):
+    success = False
+
+    input_parameters = {name: request.POST.getlist(name) for name in request.POST.keys()}
+    other_parameters = {'created_by':request.user.username, 'created_for':request.user.username}
+    submit_request = rh(request.user.username)
+    #reference_data_point is null since upload creates the root data point
+    submit_request.submitRequest(request.POST.getlist('reference_data_points'), request.POST['step_id'], other_parameters, step_type='1:1', input_parameters=input_parameters)
 
     return HttpResponse()
+
 
 
 @csrf_exempt
@@ -267,6 +280,6 @@ def handle_uploaded_file(f, filename, foldername, username):
         return False
 
 
-def createTask():
-    #use setattr for iterating through a list of items
-    pass
+@csrf_exempt
+def getAllDataPoints(request):
+    return JsonResponse(serializers.serialize('json', DataPoint.objects.filter(created_by=request.user.username)), safe=False)
