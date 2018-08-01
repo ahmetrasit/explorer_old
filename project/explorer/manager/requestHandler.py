@@ -86,6 +86,7 @@ class requestHandler:
 
             reference_data_point = DataPoint.objects.get(pk=reference)
             reference_data_point['folder_path'] = data_point_folder
+            reference_data_point[ancestry] = reference_data_point[ancestry] + ',' + reference
             reference_data_point.save()
             self.modifyPermissions(data_point_folder)
             return data_point_folder
