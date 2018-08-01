@@ -17,7 +17,7 @@ class requestHandler:
     #main function to submit request
     def submitRequest(self, reference_data_points, step_id, other_parameters, input_files = [], input_parameters=[], step_type=''):
         if len(reference_data_points) > 0:  #implementing only *:* and 1:1
-            new_data_points = [(reference, self.createDataPointFromReference(reference, input_parameters)) for reference in reference_data_points]
+            new_data_points = [(reference, self.createDataPointFromReference(reference, step_id, input_parameters)) for reference in reference_data_points]
             status = self.createTaskFromReference(new_data_points, step_id, input_parameters, self.multiTaskStep(step_id))
         else:   #request from upload
             samples = self.purifySamples(input_files, input_parameters)
@@ -79,15 +79,17 @@ class requestHandler:
             return samples
 
 
-    def createDataPointFromReference(self, reference, input_parameters):
+    def createDataPointFromReference(self, reference, step_id, input_parameters):
         try:
             print(reference)
             data_point_folder = views.requestNewFolder(self.username, 'data_point')
             print(data_point_folder)
             os.mkdir(data_point_folder)
+            selected_step = Step.objects.get(pk=step_id)
 
             reference_data_point = DataPoint.objects.get(pk=reference)
             reference_data_point.pk = None
+            reference_data_point.major_types = selected_step.output_major_data_category
             reference_data_point.folder_path = data_point_folder
             reference_data_point.ancestry = reference_data_point.ancestry + ',' + reference
             reference_data_point.save()

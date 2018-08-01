@@ -28,7 +28,7 @@ def homepage(request):
 
 
 @login_required
-def addStep(request):
+def createStep(request):
     render_dict = getConfigDict(request)
     form = StepForm
     render_dict['step_form']=form(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
