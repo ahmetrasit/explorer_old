@@ -17,7 +17,6 @@ class requestHandler:
     #main function to submit request
     def submitRequest(self, reference_data_points, step_id, other_parameters, input_files = [], input_parameters=[], step_type=''):
         if len(reference_data_points) > 0:  #implementing only *:* and 1:1
-            print(reference_data_points)
             new_data_points = [(reference, self.createDataPointFromReference(reference, input_parameters)) for reference in reference_data_points]
             status = self.createTaskFromReference(new_data_points, step_id, input_parameters, self.multiTaskStep(step_id))
         else:   #request from upload
