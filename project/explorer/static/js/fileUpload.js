@@ -4,6 +4,8 @@ var fileSelect = document.getElementById('file-select');
 var selected_files
 var file_types
 var data_type = ''
+var relationships = {'1:1':'OneToOne', '1>*':'OneToMany', '*:*':'ManyEachToMany', '*>1':'ManyToOne', '*>*':'ManyToMany'}
+var reverse_relationships = {'OneToOne':'1:1', 'OneToMany':'1>*', 'ManyEachToMany':'*:*', 'ManyToOne':'*>1', 'ManyToMany':'*>*'}
 
 
 
@@ -74,7 +76,7 @@ function addSampleInputPerFile(sample_input_fields) {
     .append('span').attr('class', 'input-group-text form-control mx-0').html(function(d,i){return d})
   curr_input.selectAll('input').data(sample_input_fields).enter()
     .append('input').on('keyup', checkLength).attr('type', 'text').attr('class', 'form-control').attr('data-bv-notempty', true)
-    .attr('placeholder', function(d,i){return d}).attr('name', function(d,i){return this.parentNode.id + "_" + d})
+    .attr('placeholder', function(d,i){return d}).attr('name', function(d,i){return this.parentNode.id + "_" + d.replace(/\W/g, '_')})
 }
 
 
@@ -162,6 +164,9 @@ function uploadFiles(){
    var selected_category = document.getElementById('data_categories_select')
    formData.append('data_category', selected_category.options[selected_category.selectedIndex].value)
 
+   formData.append('step_type', reverse_relationships[$('.active').find('div:visible').parent('.tab-pane')[0].id])
+
+
 
   var xhr = new XMLHttpRequest()
   xhr.open('POST', '/upload/', true);
@@ -216,7 +221,6 @@ function uploadFileTypeChange(){
 
 
 function prepareUploadSteps(upload_steps, data_type) {
-  var relationships = {'1:1':'OneToOne', '1>*':'OneToMany', '*:*':'ManyEachToMany', '*>1':'ManyToOne', '*>*':'ManyToMany'}
   var data_categories_select = document.getElementById('data_categories_select')
   var curr_data_category = data_categories_select.options[data_categories_select.selectedIndex]
   for (type of Object.keys(relationships)) {

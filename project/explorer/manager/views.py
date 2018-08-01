@@ -24,8 +24,6 @@ def homepage(request):
     render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
     render_dict['reference_form'] = ReferenceForm()
 
-    #rh.submitRequest()
-    #print(MajorDataCategory.objects.values_list('category', flat=True))
     return render(request, 'homepage.html', render_dict)
 
 
@@ -240,10 +238,12 @@ def upload(request):
             filename = str(file)
             success = handle_uploaded_file(file, filename, upload_folder, request.user.username)
         if success:
-            input_parameters = ((name, request.POST.getlist(name)) for name in request.POST.keys())
-            other_parameters = ('data_category', request.POST['data_category'])
+            input_parameters = {name: request.POST.getlist(name) for name in request.POST.keys()}
+            other_parameters = {'major_types':request.POST['data_category'], 'created_by':request.user.username,
+                                'created_for':request.user.username}
             submit_request = rh(request.user.username)
-            submit_request.submitRequest(request.POST['selected_upload_step'], filenames, input_parameters, other_parameters)
+            #reference_data_point is null since upload creates the root data point
+            submit_request.submitRequest([], request.POST['selected_upload_step'], other_parameters, input_files=filenames, step_type=request.POST['step_type'], input_parameters=input_parameters)
 
 
     return HttpResponse()

@@ -94,7 +94,7 @@ class Task(models.Model):
 
     created_by = models.CharField(max_length=256)
     created_for = models.CharField(max_length=256, blank=True, null=True)
-    created_on = models.CharField(max_length=64)
+    created_on = models.DateTimeField(auto_now=True)
     started_on = models.CharField(max_length=64, blank=True, null=True)
     finished_on = models.CharField(max_length=64, blank=True, null=True)
     is_last = models.CharField(max_length=64)
@@ -107,8 +107,9 @@ class Task(models.Model):
 
 
 class DataPoint(models.Model):
-    short_name = models.CharField(max_length=256)
-    description = models.CharField(max_length=2048)
+    sample_name = models.CharField(max_length=256, blank=True, null=True)
+    type = models.CharField(max_length=256, blank=True, null=True)
+    description = models.CharField(max_length=2048, blank=True, null=True)
 
     protocol_id = models.IntegerField(blank=True, null=True)
     step_id = models.IntegerField()
@@ -117,20 +118,20 @@ class DataPoint(models.Model):
 
     created_by = models.CharField(max_length=256)
     created_for = models.CharField(max_length=256, blank=True, null=True)
-    created_on = models.CharField(max_length=64)
+    created_on = models.DateTimeField(auto_now=True)
     folder_path = models.TextField()
     access_list = models.TextField(blank=True, null=True)
 
     major_types = models.TextField()
     minor_types = models.TextField(blank=True, null=True)
-    source_file = models.TextField()
-    input_files = models.TextField()
-    output_files = models.TextField()
+    source_file = models.TextField(blank=True, null=True)
+    input_files = models.TextField(blank=True, null=True)
+    output_files = models.TextField(blank=True, null=True)
 
     zipped = models.CharField(max_length=64, blank=True, null=True)
     projects = models.TextField(blank=True, null=True)
     special = models.CharField(max_length=64, blank=True, null=True)
-    size = models.TextField()
+    size = models.TextField(blank=True, null=True)
 
     special = models.CharField(max_length=64, blank=True, null=True)
-    key_value = models.TextField()
+    key_value = models.TextField(blank=True, null=True)
