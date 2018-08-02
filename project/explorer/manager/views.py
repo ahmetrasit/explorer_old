@@ -133,7 +133,7 @@ def addDataCategory(request):
             render_dict['form']=formInput
 
     data_category_fields = ['category', 'description', 'sample_schema']
-    render_dict['data_categories'] = MajorDataCategory.objects.all().values(*data_category_fields)[::-1]
+    render_dict['data_categories_show'] = MajorDataCategory.objects.all().values(*data_category_fields)[::-1]
     render_dict['data_category_fields'] = data_category_fields
     return render(request, 'addDataCategory.html', render_dict)
 

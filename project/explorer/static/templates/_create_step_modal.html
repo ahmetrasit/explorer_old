@@ -124,6 +124,7 @@
   var step_advanced_mode_toggle = false
   var valid_step = false
   //i:input, s:select
+  console.log(data_categories);
   var step_dict = {
       'major':data_categories,
       'parameter':['cpu'],
@@ -131,6 +132,9 @@
       'genomeRef':['ws250', 'ws262', 'latest'],
       'geneList':['csr', 'wago'],
     }
+  console.log('first');
+  console.log(step_dict);
+  console.log(data_categories);
 
   //s for select, i for input
   var input_types = {
@@ -176,6 +180,9 @@
     var type = fields[0]
     var action = fields[1]
     var options = step_dict[type]
+    console.log(type, fields);
+    console.log(step_dict);
+    console.log(options);
     d3.select('#io_inputfield').style('display', 'none')
     d3.select('#io_selectfield').style('display', 'none').select('select').selectAll('option').remove()
     d3.select('#io_selectfield2').style('display', 'none').select('select').selectAll('option').remove()
@@ -183,6 +190,7 @@
       d3.select('#io_selectfield').style('display', 'block')
       d3.select('#io_selectfield').select('select').on('change', updateSelect2).selectAll('option').data(options).enter()
           .append('option').text(function(d){return d})
+          console.log(options);
       updateSelect2()
     }else if (action == 'name') {
       d3.select('#io_selectfield').style('display', 'block')
@@ -265,9 +273,10 @@
   }
 
   function humanize(){
-    options = d3.select('#io_options').selectAll('option')
-    options.remove()
-    new_options = options.data(Object.keys(input_descriptions)).enter()
+    options = d3.select('#io_options')
+    console.log(options);
+    options.selectAll('option').remove()
+    new_options = options.selectAll('option').data(Object.keys(input_descriptions)).enter()
       .append('option')
     new_options.text(function(d){return input_descriptions[d]})
     new_options.attr('value', function(d){return d})

@@ -209,7 +209,6 @@ function uploadFiles(){
 
 
 function uploadFileTypeChange(){
-  console.log('uftc');
   if (data_type.length > 0) {
     var select = document.getElementById('data_categories_select')
     data_type = select.options[select.selectedIndex].value
@@ -227,8 +226,6 @@ function prepareUploadSteps(upload_steps, data_type) {
     var filtered = upload_steps.filter(x=>x.fields.input_output_relationship==type & x.fields.input_major_data_category==data_type)
     d3.select('#'+relationships[type]).select('.upload_steps').selectAll('select').remove()
     if (type.includes('>*')) {
-      console.log(type);
-      console.log(filtered);
       if (filtered.length > 0) {
         var regular = [{pk:-2, fields:{'short_name':'Select upload method'}}].concat(filtered)
         d3.select('#'+relationships[type]).select('.show_only_samples').style('display', 'block')

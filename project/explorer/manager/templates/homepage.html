@@ -89,8 +89,6 @@
 			function filterStepSelectDP() {
 				var selected_node = right_click_data_point
 				last_output_category = data_points.filter(x=>x.pk==selected_node)[0].fields.major_types
-				console.log(right_click_data_point);
-				console.log(last_output_category);
 
 		    var filteredSteps = steps.filter(x=>x.fields.input_major_data_category==last_output_category)
 		    var typed = document.getElementById('select_step_input_dp').value.trim()
@@ -236,7 +234,6 @@
 		// append the svg object to the body of the page
 		// appends a 'group' element to 'svg'
 		// moves the 'group' element to the top left margin
-		console.log(svg_id);
 		var svg = d3.select('#data_point_svg').append('svg').attr('id', svg_id)
 		    .attr("width", width + margin.right + margin.left)
 		    .attr("height", height + margin.top + margin.bottom)
@@ -314,7 +311,7 @@
 		          return d.children
 		      })
 		      .attr("text-anchor", 'middle')
-		      .text(function(d) { console.log(d);return d.data.id; });
+		      .text(function(d) { return d.data.id; });
 
 			nodeEnter.append('hidden')
 					.attr('value', function(d) { return d.data.id })
@@ -510,10 +507,8 @@
 									.style(style.text)
 
 							var z_pre = d3.selectAll('.tmp').filter(function(d, i) { return i == 0  })
-							console.log(z_pre._groups[0]);
 							z = z_pre._groups[0].map(function(x){ return x.getBBox(); });
 							width = d3.max(z.map(function(x){ return x.width; }));
-							console.log(width);
 							margin = margin * width;
 							width =  width + 2 * margin;
 							height = d3.max(z.map(function(x){ return x.height + margin / 2; }));
