@@ -80,13 +80,14 @@ class Reference(models.Model):
 
 class Task(models.Model):
     step_id = models.IntegerField()
-    protocol_id = models.IntegerField()
-    process_id = models.IntegerField()
+    protocol_id = models.IntegerField(blank=True, null=True)
+    process_id = models.IntegerField(blank=True, null=True)
     retry_of = models.IntegerField(blank=True, null=True)
     depends_on = models.IntegerField(blank=True, null=True)
 
     input_file = models.TextField()
-    script = models.TextField()
+    semi_complete_script = models.TextField()
+    complete_script = models.TextField()
     folder_path = models.TextField()
     major_types = models.TextField()
     minor_types = models.TextField(blank=True, null=True)
@@ -97,7 +98,6 @@ class Task(models.Model):
     created_on = models.DateTimeField(auto_now=True)
     started_on = models.CharField(max_length=64, blank=True, null=True)
     finished_on = models.CharField(max_length=64, blank=True, null=True)
-    is_last = models.CharField(max_length=64)
     status = models.CharField(max_length=64)
     finished_status = models.CharField(max_length=64, blank=True, null=True)
     retries_left = models.IntegerField()

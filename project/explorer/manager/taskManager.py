@@ -1,6 +1,7 @@
 from django.core import serializers
 from manager.models import *
 from manager import views
+from .requestHandler import requestHandler as rh
 import os
 import re
 import time
@@ -8,10 +9,10 @@ import random
 import json
 import html
 
-class requestHandler:
+class taskManager:
 
-    def __init__(self, username):
-        self.username = username
+    def __init__(self):
+        pass
 
 
     #main function to submit request
@@ -21,15 +22,13 @@ class requestHandler:
             status = self.createTaskFromReference(new_data_points, step_id, input_parameters, self.multiTaskStep(step_id))
         else:   #request from upload
             samples = self.purifySamples(input_files, input_parameters)
-            print(samples)
             new_data_points = [(sample, self.createDataPointFromUpload(sample, input_parameters, other_parameters)) for sample in samples]
-            print(new_data_points)
             status = self.createTaskFromUpload(reference_data_points, step_id, new_data_points, input_parameters, other_parameters, step_type)
 
 
 
     def createTaskFromReference(self, new_data_points, step_id, input_parameters, multi_task):
-        input_category, output_category, script, subfolder_path = self.getDataPointRecords(step_id)
+        processed_script = self.getDataPointRecords(step_id)
         if multi_task:
             for data_point in new_data_points:
                 pass
@@ -39,39 +38,17 @@ class requestHandler:
 
 
     def createTaskFromUpload(self, reference_data_points, step_id, new_data_points, input_parameters, other_parameters, step_type):
-        input_category, output_category, script, subfolder_path, step_type = self.getDataPointRecords(step_id, other=input_parameters)
-        new_task = Task()
-        print(input_category, output_category, script, subfolder_path, step_type)
-
-        if step_type == '*:*':
-            for data_point in new_data_points:
-                print(data_point)
-                (input_file, _), folder = data_point
-                new_task.step_id = step_id
-                new_task.input_file = ''
-                new_task.semi_complete_script = ''
-                new_task.major_types = output_category
-                new_task.minor_types = ''
-                new_task.created_by = self.username
-                new_task.status = 'created'
-                new_task.retries_left = 1
-                new_task.save()
-                print('task created for *:*')
-        elif step_type == '1:1':
-            (input_file, _), folder = new_data_points[0]
-            new_task.step_id = step_id
-            new_task.input_file = input_file
-            new_task.semi_complete_script = script
-            new_task.major_types = output_category
-            new_task.minor_types = ''
-            new_task.created_by = self.username
-            new_task.status = 'created'
-            new_task.retries_left = 1
-            new_task.save()
-            print('task created for 1:1')
-        else:
-            print('not implemented yet')
-
+        if int(step_id) < 0: #means just upload
+            pass
+        else:   #means real step
+            processed_script = self.getDataPointRecords(step_id)
+            if step_type == '*:*':
+                for data_point in new_data_points:
+                    pass
+            elif step_type == '1:1':
+                pass
+            else:
+                pass
 
 
     def multiTaskStep(self, step_id):
@@ -80,7 +57,7 @@ class requestHandler:
                 return True
             return False
         else:
-            return False
+            return True
 
 
     def purifySamples(self, input_files, input_parameters):
@@ -150,18 +127,17 @@ class requestHandler:
             value = int(value or 0) if '_id' in field else value
             setattr(new_data_point, field, value)
         new_data_point.save()
-        print('data point created')
+        print('saved')
 
 
-    def getDataPointRecords(self, step_id, other={}):
-
+    def getDataPointRecords(self, step_id):
         if int(step_id )> -1:
-            step = Step.objects.get(pk=step_id)
-            return step.input_major_data_category, step.output_major_data_category, step.script, step.subfolder_path, step.input_output_relationship
+            step = Step.objects.filter(pk=step_id)
         else:
-            type = other['data_category'][0]
-            step_type = other['step_type'][0]
-            return type, type, 'mv <fs_' + type + ' >f_output', '', step_type
+            step = {}
+        #process step_id
+        #return inputs, outputs, types
+        pass
 
 
     def modifyPermissions(self, data_point_folder):
