@@ -61,7 +61,6 @@ class taskManager:
     def updateDbFields(self, task):
         pass
 
-
     def fixBroken(self, failed):
         pass
 
