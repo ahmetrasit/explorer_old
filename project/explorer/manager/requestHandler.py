@@ -29,13 +29,39 @@ class requestHandler:
 
 
     def createTaskFromReference(self, new_data_points, step_id, input_parameters, multi_task):
-        input_category, output_category, script, subfolder_path = self.getDataPointRecords(step_id)
-        if multi_task:
+        input_category, output_category, script, subfolder_path, step_type = self.getDataPointRecords(step_id)
+        input_category, output_category, script, subfolder_path, step_type = self.getDataPointRecords(step_id, other=input_parameters)
+        new_task = Task()
+        print(input_category, output_category, script, subfolder_path, step_type)
+
+        if step_type == '*:*':
             for data_point in new_data_points:
-                pass
+                print(data_point)
+                (input_file, _), folder = data_point
+                new_task.step_id = step_id
+                new_task.input_file = ''
+                new_task.semi_complete_script = script
+                new_task.major_types = output_category
+                new_task.minor_types = ''
+                new_task.created_by = self.username
+                new_task.status = 'created'
+                new_task.retries_left = 1
+                new_task.save()
+                print('task created for *:*')
+        elif step_type == '1:1':
+            (input_file, _), folder = new_data_points[0]
+            new_task.step_id = step_id
+            new_task.input_file = input_file
+            new_task.semi_complete_script = script
+            new_task.major_types = output_category
+            new_task.minor_types = ''
+            new_task.created_by = self.username
+            new_task.status = 'created'
+            new_task.retries_left = 1
+            new_task.save()
+            print('task created for 1:1')
         else:
-            pass
-        pass
+            print('not implemented yet')
 
 
     def createTaskFromUpload(self, reference_data_points, step_id, new_data_points, input_parameters, other_parameters, step_type):
@@ -49,7 +75,7 @@ class requestHandler:
                 (input_file, _), folder = data_point
                 new_task.step_id = step_id
                 new_task.input_file = ''
-                new_task.semi_complete_script = ''
+                new_task.semi_complete_script = script
                 new_task.major_types = output_category
                 new_task.minor_types = ''
                 new_task.created_by = self.username
