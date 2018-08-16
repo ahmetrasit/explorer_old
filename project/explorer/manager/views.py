@@ -24,6 +24,10 @@ def homepage(request):
     render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
     render_dict['reference_form'] = ReferenceForm()
 
+    #for debugging, remove in beta
+    render_dict['tasks'] = Task.objects.all().values()[::-1]
+    render_dict['task_fields'] = [str(curr).split('.')[-1] for curr in Task._meta.get_fields()]
+
     return render(request, 'homepage.html', render_dict)
 
 
@@ -241,7 +245,7 @@ def upload(request):
         if success:
             input_parameters = {name: request.POST.getlist(name) for name in request.POST.keys()}
             other_parameters = {'major_types':request.POST['data_category'], 'created_by':request.user.username,
-                                'created_for':request.user.username}
+                                'created_for':request.user.username, 'upload_folder': upload_folder}
             submit_request = rh(request.user.username)
             #reference_data_point is null since upload creates the root data point
             submit_request.submitRequest([], request.POST['selected_upload_step'], other_parameters, input_files=filenames, step_type=request.POST['step_type'], input_parameters=input_parameters)

@@ -88,7 +88,9 @@ class Task(models.Model):
     input_file = models.TextField()
     semi_complete_script = models.TextField()
     complete_script = models.TextField()
-    folder_path = models.TextField()
+    starting_folder_path = models.TextField()
+    temporary_folder_path = models.TextField()
+    target_folder_path = models.TextField()
     major_types = models.TextField()
     minor_types = models.TextField(blank=True, null=True)
     save_outputs_zipped = models.CharField(max_length=64)
@@ -128,10 +130,9 @@ class DataPoint(models.Model):
     input_files = models.TextField(blank=True, null=True)
     output_files = models.TextField(blank=True, null=True)
 
+    status = models.CharField(max_length=64)
     zipped = models.CharField(max_length=64, blank=True, null=True)
     projects = models.TextField(blank=True, null=True)
     special = models.CharField(max_length=64, blank=True, null=True)
     size = models.TextField(blank=True, null=True)
-
-    special = models.CharField(max_length=64, blank=True, null=True)
     key_value = models.TextField(blank=True, null=True)

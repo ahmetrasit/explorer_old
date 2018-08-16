@@ -24,39 +24,45 @@ class requestHandler:
             print(samples)
             new_data_points = [(sample, self.createDataPointFromUpload(sample, input_parameters, other_parameters)) for sample in samples]
             print(new_data_points)
-            status = self.createTaskFromUpload(reference_data_points, step_id, new_data_points, input_parameters, other_parameters, step_type)
+            status = self.createTaskFromUpload(reference_data_points, step_id, new_data_points, input_parameters, other_parameters, step_type, input_files, other_parameters['upload_folder'])
 
 
     def createTaskFromReference(self, new_data_points, step_id, input_parameters, multi_task):
         input_category, output_category, script, subfolder_path, step_type = self.getDataPointRecords(step_id, other=input_parameters)
-        new_task = Task()
         print(input_category, output_category, script, subfolder_path, step_type)
 
         if step_type == '*:*' or step_type == '1:1':
             for data_point in new_data_points:
+                new_task = Task()
+                print(data_point)
                 print('dp', data_point)
-                (input_file, _), folder = data_point
+                reference_datapoint, folder = data_point
+
                 new_task.step_id = step_id
-                new_task.input_file = input_file
+                new_task.input_file = ''
+                new_task.depends_on = reference_datapoint
                 new_task.semi_complete_script = script
                 new_task.major_types = output_category
                 new_task.minor_types = ''
                 new_task.created_by = self.username
                 new_task.status = 'created'
                 new_task.retries_left = 1
+                new_task.starting_folder_path = DataPoint.objects.get(pk=reference_datapoint).folder_path
+                new_task.target_folder_path = folder
                 new_task.save()
                 print('task created for', step_type)
 
 
-    def createTaskFromUpload(self, reference_data_points, step_id, new_data_points, input_parameters, other_parameters, step_type):
+    def createTaskFromUpload(self, reference_data_points, step_id, new_data_points, input_parameters, other_parameters, step_type, input_files, upload_folder):
         input_category, output_category, script, subfolder_path, step_type = self.getDataPointRecords(step_id, other=input_parameters)
-        new_task = Task()
+
         print(input_category, output_category, script, subfolder_path, step_type)
 
         if step_type == '*:*' or step_type == '1:1':
             for data_point in new_data_points:
+                new_task = Task()
                 print(data_point)
-                (input_file, _), folder = data_point
+                reference_datapoint, folder = data_point
                 new_task.step_id = step_id
                 new_task.input_file = ''
                 new_task.semi_complete_script = script
@@ -65,6 +71,8 @@ class requestHandler:
                 new_task.created_by = self.username
                 new_task.status = 'created'
                 new_task.retries_left = 1
+                new_task.starting_folder_path = upload_folder
+                new_task.target_folder_path = folder
                 new_task.save()
                 print('task created for *:*')
         else:
@@ -113,6 +121,7 @@ class requestHandler:
             reference_data_point.major_types = selected_step.output_major_data_category
             reference_data_point.folder_path = data_point_folder
             reference_data_point.ancestry = reference_data_point.ancestry + ',' + reference
+            reference_data_point.status = 'waiting'
             reference_data_point.save()
             self.modifyPermissions(data_point_folder)
             return data_point_folder
@@ -146,6 +155,7 @@ class requestHandler:
             value = other_parameters[field] if field in other_parameters else ''
             value = int(value or 0) if '_id' in field else value
             setattr(new_data_point, field, value)
+        new_data_point.status = 'waiting'
         new_data_point.save()
         print('data point created')
 

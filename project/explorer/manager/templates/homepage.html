@@ -73,6 +73,8 @@
 		{%endif%}
 
 
+	<hr>
+	{% include "templates/_task_list.html" %}
 
 
 
@@ -161,7 +163,9 @@
 			function createTree(data_points){
 				var simplified = data_points.map(function (x){
 					var anc=x.fields.ancestry.split(',')
-					return {'id':String(x.pk), 'parent':anc[anc.length-1], 'ancestry':anc, 'category':x.major_types}
+					console.log(x.fields.status)
+
+					return {'id':String(x.pk), 'parent':anc[anc.length-1], 'ancestry':anc, 'category':x.major_types, 'status':x.fields.status, 'category':x.major_types}
 				}).sort(compareLevels)
 
 				var roots = list_to_tree(simplified)
@@ -207,6 +211,12 @@
 	  fill: #fff;
 	  stroke: steelblue;
 	  stroke-width: 3px;
+	}
+
+	.waiting circle {
+	  stroke: green;
+		stroke-width: 2px;
+	  stroke-dasharray:.15em;
 	}
 
 	.node text {
@@ -287,7 +297,7 @@
 
 		  // Enter any new modes at the parent's previous position.
 		  var nodeEnter = node.enter().append('g')
-		      .attr('class', 'node')
+		      .attr('class', function(d,i){return d.data.status + ' node'})
 		      .attr("transform", function(d) {
 		        return "translate(" + source.y0 + "," + source.x0 + ")";
 		    })
@@ -298,7 +308,7 @@
 
 		  // Add Circle for the nodes
 		  nodeEnter.append('circle')
-		      .attr('class', 'node')
+		      .attr('class', function(d,i){return d.data.status + ' node'})
 		      .attr('r', 1e-6)
 		      .style("fill", function(d) {
 		          return d._children ? "lightsteelblue" : "#fff";
