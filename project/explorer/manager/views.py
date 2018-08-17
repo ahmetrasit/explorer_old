@@ -27,6 +27,8 @@ def homepage(request):
     #for debugging, remove in beta
     render_dict['tasks'] = Task.objects.all().values()[::-1]
     render_dict['task_fields'] = [str(curr).split('.')[-1] for curr in Task._meta.get_fields()]
+    render_dict['data_points_debug'] = DataPoint.objects.all().values()[::-1]
+    render_dict['data_point_fields'] = [str(curr).split('.')[-1] for curr in DataPoint._meta.get_fields()]
 
     return render(request, 'homepage.html', render_dict)
 

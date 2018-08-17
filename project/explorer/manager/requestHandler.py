@@ -21,7 +21,7 @@ class requestHandler:
             status = self.createTaskFromReference(new_data_points, step_id, input_parameters, self.multiTaskStep(step_id))
         else:   #request from upload
             samples = self.purifySamples(input_files, input_parameters)
-            print(samples)
+            print('sr', samples)
             new_data_points = [(sample, self.createDataPointFromUpload(sample, input_parameters, other_parameters)) for sample in samples]
             print(new_data_points)
             status = self.createTaskFromUpload(reference_data_points, step_id, new_data_points, input_parameters, other_parameters, step_type, input_files, other_parameters['upload_folder'])
@@ -140,14 +140,14 @@ class requestHandler:
             other_parameters['sample_name'] = parameters['sample_name']
             other_parameters['description'] = parameters['description']
             other_parameters['type'] = parameters['type']
-            self.createDataPointRecord(data_point_folder, other_parameters)
+            self.createDataPointRecord(data_point_folder, other_parameters, filename, parameters)
             self.modifyPermissions(data_point_folder)
             return data_point_folder
         except Exception as e:
                 print('Error creating data point folder:{} for {}'.format(data_point_folder, e))
 
 
-    def createDataPointRecord(self, data_point_folder, other_parameters):
+    def createDataPointRecord(self, data_point_folder, other_parameters, filename, parameters):
         data_point_fields = [str(field).split(".")[-1] for field in DataPoint._meta.get_fields() if '.created_on' not in str(field)][1:] #excluding id
 
         new_data_point = DataPoint()
@@ -156,6 +156,8 @@ class requestHandler:
             value = int(value or 0) if '_id' in field else value
             setattr(new_data_point, field, value)
         new_data_point.status = 'waiting'
+        new_data_point.input_files = filename
+        new_data_point.key_value = '_|_'.join(['{}:{}'.format(key, ';'.join(value) if isinstance(value, list) else value) for key, value in parameters.items()])
         new_data_point.save()
         print('data point created')
 

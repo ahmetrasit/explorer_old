@@ -1,17 +1,16 @@
 
 
-
 	<hr class="col-12">
 	<div class="container">
 		<div class="jumbotron">
-			<h1>Tasks</h1>
-			<p>List of tasks for fast debugging</p>
+			<h1>Data Points</h1>
+			<p>List of Data Points for fast debugging</p>
 		</div>
 
 		<table class="table table-responsive table-bordered table-striped text-center" align='center' style="margin: 0 auto !important;width: 100% !important; ">
 			<thead>
 				<tr>
-			    {% for field in task_fields %}
+			    {% for field in data_point_fields %}
 					<th style="font-size:.8em" class='m-0 p-1'>
 						{{field }}
 					</th>
@@ -19,9 +18,9 @@
 				</tr>
 			</thead>
 			<tbody>
-				{% for task in tasks %}
+				{% for data_point in data_points_debug %}
 				<tr>
-					{% for key,value in task.items %}
+					{% for key,value in data_point.items %}
 						<td style="font-size:.8em" class='m-0 p-1'>
 							{{value}}
 						</td>
@@ -32,5 +31,3 @@
 		</table>
 
 	</div>
-	<br>
-	<br>
