@@ -85,7 +85,7 @@ class Task(models.Model):
     retry_of = models.IntegerField(blank=True, null=True)
     depends_on = models.IntegerField(blank=True, null=True)
 
-    input_file = models.TextField()
+    input_files = models.TextField()
     semi_complete_script = models.TextField()
     complete_script = models.TextField()
     starting_folder_path = models.TextField()
