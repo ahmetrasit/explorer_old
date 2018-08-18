@@ -64,14 +64,12 @@ class requestHandler:
                 new_task = Task()
                 print('dp in ctfu', data_point)
                 (input_files, parameters), folder = data_point
-                script_input_replaced = re.sub('<f[sm]_[\w._-]+', input_files, script)
-                script_output_replaced = re.sub('>f_output', folder+parameters['sample_name']+'.'+output_category, script_input_replaced)
-                print('sip', script_input_replaced)
-                print('sop', script_output_replaced)
+                #script_input_replaced = re.sub('<f[sm]_[\w._-]+', input_files, script)
+                #script_output_replaced = re.sub('>f_output', folder+parameters['sample_name']+'.'+output_category, script_input_replaced)
 
                 new_task.step_id = step_id
                 new_task.input_files = input_files
-                new_task.semi_complete_script = script_output_replaced
+                new_task.semi_complete_script = script
                 new_task.major_types = output_category
                 new_task.minor_types = ''
                 new_task.created_by = self.username
