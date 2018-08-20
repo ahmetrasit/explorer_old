@@ -21,14 +21,16 @@ import html
 
 def homepage(request):
     render_dict = getConfigDict(request)
-    render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
-    render_dict['reference_form'] = ReferenceForm()
+    #render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
+    #render_dict['reference_form'] = ReferenceForm()
 
     #for debugging, remove in beta
     render_dict['tasks'] = Task.objects.all().values()[::-1]
     render_dict['task_fields'] = [str(curr).split('.')[-1] for curr in Task._meta.get_fields()]
     render_dict['data_points_debug'] = DataPoint.objects.all().values()[::-1]
     render_dict['data_point_fields'] = [str(curr).split('.')[-1] for curr in DataPoint._meta.get_fields()]
+    render_dict['references'] = DataPoint.objects.all().values()[::-1]
+    render_dict['reference_fields'] = [str(curr).split('.')[-1] for curr in DataPoint._meta.get_fields()]
 
     return render(request, 'homepage.html', render_dict)
 
@@ -68,12 +70,12 @@ def createStep(request):
 
 def requestNewFolder(username, type):
     #temp:temporary, perm:permanent
-    types = {'upload':'temp', 'task':'temp', 'step':'perm', 'data_point':'perm'}
+    types = {'upload':'temp', 'task':'temp', 'step':'perm', 'data_point':'perm', 'reference':'perm'}
     folderName = '!'
     if type in types:
         curr_time = int(time.time())
         rand_num = random.randint(111111,999999)
-        folderName = 'data/{}/{}_{}/'.format(types[type], curr_time, rand_num)
+        folderName = 'data/{}/{}/{}_{}/'.format(types[type], type, curr_time, rand_num)
 
     return folderName
 
@@ -185,6 +187,8 @@ def getConfigDict(request):
     render_dict['upload_steps'] = serializers.serialize('json', Step.objects.filter(special='upload'))
     render_dict['steps'] = serializers.serialize('json', Step.objects.all())
     render_dict['data_points'] = serializers.serialize('json', DataPoint.objects.filter(created_by=request.user.username))
+    render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
+    render_dict['reference_form'] = ReferenceForm()
     last = MainConfiguration.objects.last()
     if last:
         system_config = model_to_dict(last)
@@ -266,6 +270,41 @@ def addStep(request):
     submit_request.submitRequest(request.POST.getlist('reference_data_points'), request.POST['step_id'], other_parameters, step_type='1:1', input_parameters=input_parameters)
 
     return HttpResponse()
+
+
+@login_required
+def addReference(request):
+    render_dict = getConfigDict(request)
+    if request.method == 'POST':
+        formInput = form(request.POST)
+        if formInput.is_valid():
+            reference_folder = requestNewFolder(request.user.username, 'reference')
+            step_filenames = []
+            for i in range(len(request.FILES.getlist('referenceFiles'))):
+                file = request.FILES.getlist('referenceFiles')[i]
+                filename = str(file)
+                referene_filenames.append(filename)
+                success = handle_uploaded_file(file, filename, reference_folder, request.user.username)
+            temp_form = formInput.save(commit=False)
+            temp_form.created_by = request.user.username
+            temp_form.script = formInput.cleaned_data['raw_script'].strip()
+            temp_form.subfolder_path = reference_folder
+            if length(formInput.cleaned_data['raw_script'].strip()) > 0:    #do it later
+                temp_form.completed = 'waiting'
+                temp_form.save()
+                message = 'Cannot create reference having scripts for now.'
+            else:   #just upload files
+                temp_form.completed = 'completed'
+                temp_form.save()
+                message = 'Reference successfully created.'
+        else:
+            message = 'Cannot create reference.'
+        render_dict['message'] = message
+        render_dict['reference_form']=formInput
+    render_dict['references'] = Reference.objects.all().values()[::-1]
+    render_dict['reference_fields'] = [str(curr).split('.')[-1] for curr in Reference._meta.get_fields()]
+    return render(request, 'addReference.html', render_dict)
+
 
 
 

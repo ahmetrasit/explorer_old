@@ -3,21 +3,18 @@
 
 
 
-	<title>{% block title %}Create Analysis Step{% endblock %}</title>
+	<title>{% block title %}Create Reference{% endblock %}</title>
 
 	{% block body %}
 	<div class="container">
 		<div class="jumbotron">
-			<h1>Create Analysis Step</h1>
-			<p>You can add major data categories to make data exploration more intuitive. Just think about intermediatery data points that might benefit from a branching what-if analysis.</p>
-
+			<h1>Create Reference </h1>
+			<p>You can create reference files of start scripts creating one at the end. Use placeholder if you want to provide other than file names.</p>
 			<div class="row">
 				<div class="col-md-12">
-					{% include "templates/_create_step_modal.html" %}
+					{% include "templates/_create_reference_modal.html" %}
 
 				</div>
-
-
 			</div>
 
 		</div>
@@ -40,7 +37,7 @@
 	<table class="table table-responsive table-bordered table-striped text-center" align='center' style="margin: 0 auto !important;width: 100% !important; ">
 		<thead>
 			<tr>
-		    {% for field in step_fields %}
+		    {% for field in reference_fields %}
 				<th style="font-size:.8em" class='m-0 p-1'>
 					{{field }}
 				</th>
@@ -48,9 +45,9 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% for step in steps %}
+			{% for reference in references %}
 			<tr>
-				{% for key,value in step.items %}
+				{% for key,value in reference.items %}
 					<td style="font-size:.8em" class='m-0 p-1'>
 						{{value}}
 					</td>
@@ -62,17 +59,7 @@
 
 
 
-
-
-
-
-
-
-
-
 	{% endblock %}
-
-
 
 
 	{% block afterbody %}

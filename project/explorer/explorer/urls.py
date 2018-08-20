@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^add/user$', manager_views.addUser, name='addUser'),
     url(r'^add/dataCategory$', manager_views.addDataCategory, name='addDataCategory'),
     url(r'^add/step$', manager_views.createStep, name='createStep'),
+    url(r'^add/reference$', manager_views.addReference, name='addReference'),
     url(r'^new/step/$', manager_views.addStep, name='addStep'),
     url(r'^get/data_points/$', manager_views.getAllDataPoints, name='getAllDataPoints'),
 

@@ -55,7 +55,6 @@ class requestHandler:
 
     def createTaskFromUpload(self, reference_data_points, step_id, new_data_points, input_parameters, other_parameters, step_type, input_files, upload_folder):
         input_category, output_category, script, subfolder_path, step_type = self.getDataPointRecords(step_id, other=input_parameters)
-
         print(input_category, output_category, script, subfolder_path, step_type)
 
         if step_type == '*:*' or step_type == '1:1':
@@ -66,7 +65,6 @@ class requestHandler:
                 (input_files, parameters), folder = data_point
                 #script_input_replaced = re.sub('<f[sm]_[\w._-]+', input_files, script)
                 #script_output_replaced = re.sub('>f_output', folder+parameters['sample_name']+'.'+output_category, script_input_replaced)
-
                 new_task.step_id = step_id
                 new_task.input_files = input_files
                 new_task.semi_complete_script = script

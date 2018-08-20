@@ -67,14 +67,14 @@ class Reference(models.Model):
     reference_type = models.CharField(max_length=64)
     placeholder = models.CharField(max_length=256)
 
-    script = models.TextField()
-    completed = models.CharField(max_length=256)
-    special = models.CharField(max_length=256)
+    script = models.TextField(blank=True, null=True)
+    completed = models.CharField(max_length=256, blank=True, null=True)
+    special = models.CharField(max_length=256, blank=True, null=True)
     created_by = models.CharField(max_length=256)
     subfolder_path = models.CharField(max_length=256)
-    dependencies = models.TextField()
-    score = models.CharField(max_length=256)
-    key_value = models.CharField(max_length=256)
+    dependencies = models.TextField(blank=True, null=True)
+    score = models.CharField(max_length=256, blank=True, null=True)
+    key_value = models.CharField(max_length=256, blank=True, null=True)
     created_on = models.DateTimeField(auto_now=True)
 
 
