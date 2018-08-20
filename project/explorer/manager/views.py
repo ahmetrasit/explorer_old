@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import JsonResponse
 from .requestHandler import requestHandler as rh
 from .forms import *
+import pandas as pd
 import os
 import re
 import time
@@ -31,6 +32,7 @@ def homepage(request):
     render_dict['data_point_fields'] = [str(curr).split('.')[-1] for curr in DataPoint._meta.get_fields()]
     render_dict['references'] = Reference.objects.all().values()[::-1]
     render_dict['reference_fields'] = [str(curr).split('.')[-1] for curr in Reference._meta.get_fields()]
+
 
     return render(request, 'homepage.html', render_dict)
 
@@ -187,8 +189,11 @@ def getConfigDict(request):
     render_dict['upload_steps'] = serializers.serialize('json', Step.objects.filter(special='upload'))
     render_dict['steps'] = serializers.serialize('json', Step.objects.all())
     render_dict['data_points'] = serializers.serialize('json', DataPoint.objects.filter(created_by=request.user.username))
+    render_dict['references_all'] = serializers.serialize('json', Reference.objects.filter(created_by=request.user.username))
     render_dict['step_form'] = StepForm(initial={'access_list': 'public', 'status':'tested', 'special':'regular', 'no_of_outputs':'one'})
     render_dict['reference_form'] = ReferenceForm()
+    types_for_step = pd.DataFrame(list(Reference.objects.all().values_list('reference_type', 'short_name'))).groupby(0)[1].apply(list).to_json()
+    render_dict['types_for_step'] = types_for_step
     last = MainConfiguration.objects.last()
     if last:
         system_config = model_to_dict(last)
@@ -291,7 +296,7 @@ def addReference(request):
             temp_form = formInput.save(commit=False)
 
             raw_script = html.unescape(formInput.cleaned_data['ref_raw_script'].strip())
-            temp_form.reference_type = re.sub('\W+', '_', formInput.cleaned_data['reference_type'].strip())
+            temp_form.reference_type = re.sub('\W+', '-', formInput.cleaned_data['reference_type'].strip())
             temp_form.created_by = request.user.username
             temp_form.script = raw_script
 

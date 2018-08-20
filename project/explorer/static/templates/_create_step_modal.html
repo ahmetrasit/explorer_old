@@ -127,9 +127,7 @@
   var step_dict = {
       'major':data_categories,
       'parameter':['cpu'],
-      'type':['genomeRef', 'geneList'],
-      'genomeRef':['ws250', 'ws262', 'latest'],
-      'geneList':['csr', 'wago'],
+      'type':{{types_for_step|safe}}
     }
 
   //s for select, i for input
@@ -160,7 +158,7 @@
     if (cmd_fields.slice(-1)=='value') {
       var select = document.getElementById('io_inputfieldselect')
       var selected_value = select.options[select.selectedIndex].value;
-      var options = step_dict[selected_value]
+      var options = step_dict['type'][selected_value]
       if (options) {
         d3.select('#io_selectfield2').style('display', 'block')
         d3.select('#io_selectfield2').select('select').selectAll('option').remove()
@@ -173,9 +171,19 @@
   }
 
   function createSelectFieldForInputType(fields) {
+    console.log(fields);
     var type = fields[0]
+    console.log(type);
     var action = fields[1]
-    var options = step_dict[type]
+    console.log(action);
+    var options
+    if (type == 'type') {
+      options = Object.keys(step_dict[type])
+    }else {
+      options = step_dict[type]
+    }
+
+    console.log(options);
 
     d3.select('#io_inputfield').style('display', 'none')
     d3.select('#io_selectfield').style('display', 'none').select('select').selectAll('option').remove()
