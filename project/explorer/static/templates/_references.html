@@ -18,9 +18,9 @@
 				</tr>
 			</thead>
 			<tbody>
-				{% for referene in references %}
+				{% for reference in references %}
 				<tr>
-					{% for key,value in data_point.items %}
+					{% for key,value in reference.items %}
 						<td style="font-size:.8em" class='m-0 p-1'>
 							{{value}}
 						</td>

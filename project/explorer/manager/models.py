@@ -65,7 +65,7 @@ class Reference(models.Model):
     short_name = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=2048)
     reference_type = models.CharField(max_length=64)
-    placeholder = models.CharField(max_length=256)
+    placeholder = models.CharField(max_length=256, blank=True, null=True)
 
     script = models.TextField(blank=True, null=True)
     completed = models.CharField(max_length=256, blank=True, null=True)

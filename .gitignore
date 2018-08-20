@@ -1,3 +1,6 @@
 explorerenv/
-project/explorer/data/perm/
-project/explorer/data/temp/
+project/explorer/data/perm/data_point
+project/explorer/data/perm/step
+project/explorer/data/perm/reference
+project/explorer/data/temp/task
+project/explorer/data/temp/upload

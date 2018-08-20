@@ -29,8 +29,8 @@ def homepage(request):
     render_dict['task_fields'] = [str(curr).split('.')[-1] for curr in Task._meta.get_fields()]
     render_dict['data_points_debug'] = DataPoint.objects.all().values()[::-1]
     render_dict['data_point_fields'] = [str(curr).split('.')[-1] for curr in DataPoint._meta.get_fields()]
-    render_dict['references'] = DataPoint.objects.all().values()[::-1]
-    render_dict['reference_fields'] = [str(curr).split('.')[-1] for curr in DataPoint._meta.get_fields()]
+    render_dict['references'] = Reference.objects.all().values()[::-1]
+    render_dict['reference_fields'] = [str(curr).split('.')[-1] for curr in Reference._meta.get_fields()]
 
     return render(request, 'homepage.html', render_dict)
 
@@ -275,23 +275,31 @@ def addStep(request):
 @login_required
 def addReference(request):
     render_dict = getConfigDict(request)
+    form = ReferenceForm
+    reference_filenames = []
     if request.method == 'POST':
         formInput = form(request.POST)
+        print(request.POST.keys())
         if formInput.is_valid():
             reference_folder = requestNewFolder(request.user.username, 'reference')
             step_filenames = []
             for i in range(len(request.FILES.getlist('referenceFiles'))):
                 file = request.FILES.getlist('referenceFiles')[i]
                 filename = str(file)
-                referene_filenames.append(filename)
+                reference_filenames.append(filename)
                 success = handle_uploaded_file(file, filename, reference_folder, request.user.username)
             temp_form = formInput.save(commit=False)
+
+            raw_script = html.unescape(formInput.cleaned_data['ref_raw_script'].strip())
+            temp_form.reference_type = re.sub('\W+', '_', formInput.cleaned_data['reference_type'].strip())
             temp_form.created_by = request.user.username
-            temp_form.script = formInput.cleaned_data['raw_script'].strip()
+            temp_form.script = raw_script
+
+
             temp_form.subfolder_path = reference_folder
-            if length(formInput.cleaned_data['raw_script'].strip()) > 0:    #do it later
+            if len(raw_script) > 2:    #do it later
                 temp_form.completed = 'waiting'
-                temp_form.save()
+                #temp_form.save()
                 message = 'Cannot create reference having scripts for now.'
             else:   #just upload files
                 temp_form.completed = 'completed'
